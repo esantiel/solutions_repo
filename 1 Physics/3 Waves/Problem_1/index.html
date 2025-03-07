@@ -172,6 +172,147 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <h1 id="problem-1">Problem 1</h1>
+<p>Let’s dive into the fascinating world of interference patterns on a water surface caused by multiple point sources arranged at the vertices of a regular polygon. Below is a comprehensive response in Markdown format, including a Python script for simulation and visualization, fulfilling all deliverables.</p>
+<hr/>
+<h1 id="interference-patterns-on-a-water-surface">Interference Patterns on a Water Surface</h1>
+<h2 id="motivation">Motivation</h2>
+<p>When waves from different sources overlap on a water surface, they create interference patterns—regions where waves amplify (constructive interference) or cancel (destructive interference). This phenomenon, observable in ripples from multiple points, offers a visual gateway to understanding wave superposition. Exploring these patterns not only illuminates fundamental wave physics but also connects to real-world applications like acoustics, optics, and oceanography.</p>
+<p><a href="../Problem_1.html">Simulation</a></p>
+<h2 id="task-breakdown">Task Breakdown</h2>
+<h3 id="problem-statement">Problem Statement</h3>
+<p>We’ll analyze interference patterns from coherent circular waves emitted by point sources at the vertices of a regular polygon (e.g., a square). The single disturbance equation for a wave from a point source at <span class="arithmatex">\((x_s, y_s)\)</span> is:</p>
+<div class="arithmatex">\[\eta(x, y, t) = A \cos(k r - \omega t + \phi)\]</div>
+<p>where:
+- <span class="arithmatex">\(\eta\)</span>: Water surface displacement at <span class="arithmatex">\((x, y)\)</span> and time <span class="arithmatex">\(t\)</span>,
+- <span class="arithmatex">\(A\)</span>: Amplitude,
+- <span class="arithmatex">\(k = \frac{2\pi}{\lambda}\)</span>: Wave number (<span class="arithmatex">\(\lambda\)</span>: wavelength),
+- <span class="arithmatex">\(\omega = 2\pi f\)</span>: Angular frequency (<span class="arithmatex">\(f\)</span>: frequency),
+- <span class="arithmatex">\(r = \sqrt{(x - x_s)^2 + (y - y_s)^2}\)</span>: Distance from source,
+- <span class="arithmatex">\(\phi\)</span>: Initial phase.</p>
+<p>Total displacement is the sum over <span class="arithmatex">\(N\)</span> sources:</p>
+<div class="arithmatex">\[\eta_{\text{total}}(x, y, t) = \sum_{i=1}^N A \cos(k r_i - \omega t + \phi_i)\]</div>
+<h3 id="steps">Steps</h3>
+<h4 id="1-select-a-regular-polygon">1. Select a Regular Polygon</h4>
+<p>We’ll use a <strong>square</strong> (4 vertices) for simplicity and symmetry, centered at the origin with side length adjusted to fit the simulation domain.</p>
+<h4 id="2-position-the-sources">2. Position the Sources</h4>
+<p>Place sources at the vertices of a square with side length <span class="arithmatex">\(2 \, \text{m}\)</span>:</p>
+<ul>
+<li><span class="arithmatex">\((1, 1)\)</span>, <span class="arithmatex">\((1, -1)\)</span>, <span class="arithmatex">\((-1, -1)\)</span>, <span class="arithmatex">\((-1, 1)\)</span>.</li>
+</ul>
+<h4 id="3-wave-equations">3. Wave Equations</h4>
+<p>For each source at <span class="arithmatex">\((x_{s_i}, y_{s_i})\)</span>:</p>
+<div class="arithmatex">\[\eta_i(x, y, t) = A \cos(k \sqrt{(x - x_{s_i})^2 + (y - y_{s_i})^2} - \omega t + \phi_i)\]</div>
+<p>Assume <span class="arithmatex">\(A = 1 \, \text{m}\)</span>, <span class="arithmatex">\(\lambda = 0.5 \, \text{m}\)</span>, <span class="arithmatex">\(f = 2 \, \text{Hz}\)</span>, <span class="arithmatex">\(\phi_i = 0\)</span> (coherent sources).</p>
+<h4 id="4-superposition">4. Superposition</h4>
+<div class="arithmatex">\[\eta_{\text{total}}(x, y, t) = \sum_{i=1}^4 \eta_i(x, y, t)\]</div>
+<h4 id="5-analyze-interference-patterns">5. Analyze Interference Patterns</h4>
+<ul>
+<li><strong>Constructive</strong>: Waves in phase (<span class="arithmatex">\(k r_i - \omega t\)</span> differences are multiples of <span class="arithmatex">\(2\pi\)</span>), amplifying displacement.</li>
+<li><strong>Destructive</strong>: Waves out of phase (differences near <span class="arithmatex">\(\pi\)</span>), canceling displacement.</li>
+</ul>
+<h4 id="6-visualization">6. Visualization</h4>
+<p>Simulate and plot using Python.</p>
+<hr/>
+<h3 id="python-script">Python Script</h3>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# Parameters
+A = 1.0          # amplitude (m)
+lambda_ = 0.5    # wavelength (m)
+f = 2.0          # frequency (Hz)
+k = 2 * np.pi / lambda_  # wave number
+omega = 2 * np.pi * f    # angular frequency
+
+# Source positions (square vertices, side length 2 m)
+sources = np.array([[1, 1], [1, -1], [-1, -1], [-1, 1]])
+
+# Spatial grid
+x = np.linspace(-2, 2, 200)
+y = np.linspace(-2, 2, 200)
+X, Y = np.meshgrid(x, y)
+
+# Time point (snapshot)
+t = 0.0
+
+# Calculate total displacement
+eta_total = np.zeros_like(X)
+for xs, ys in sources:
+    r = np.sqrt((X - xs)**2 + (Y - ys)**2)
+    eta_total += A * np.cos(k * r - omega * t)
+
+# Visualization
+plt.figure(figsize=(10, 8))
+plt.pcolormesh(X, Y, eta_total, cmap='RdBu', shading='auto', vmin=-4, vmax=4)
+plt.colorbar(label='Displacement (m)')
+plt.scatter(sources[:, 0], sources[:, 1], c='black', label='Sources')
+plt.xlabel('X (m)')
+plt.ylabel('Y (m)')
+plt.title('Interference Pattern from Four Sources (Square) at t = 0')
+plt.legend()
+plt.axis('equal')
+plt.grid(True)
+plt.show()
+
+# Animation (optional, uncomment to run)
+"""
+from matplotlib.animation import FuncAnimation
+
+fig, ax = plt.subplots(figsize=(10, 8))
+mesh = ax.pcolormesh(X, Y, eta_total, cmap='RdBu', shading='auto', vmin=-4, vmax=4)
+plt.colorbar(mesh, label='Displacement (m)')
+ax.scatter(sources[:, 0], sources[:, 1], c='black', label='Sources')
+ax.set_xlabel('X (m)')
+ax.set_ylabel('Y (m)')
+ax.set_title('Interference Pattern from Four Sources (Square)')
+ax.legend()
+ax.axis('equal')
+ax.grid(True)
+
+def update(frame):
+    t = frame * 0.02
+    eta_total = np.zeros_like(X)
+    for xs, ys in sources:
+        r = np.sqrt((X - xs)**2 + (Y - ys)**2)
+        eta_total += A * np.cos(k * r - omega * t)
+    mesh.set_array(eta_total)
+    return [mesh]
+
+ani = FuncAnimation(fig, update, frames=100, interval=50, blit=True)
+plt.show()
+"""
+</code></pre>
+<hr/>
+<h2 id="deliverables">Deliverables</h2>
+<h3 id="explanation">Explanation</h3>
+<ul>
+<li>
+<p><strong>Wave Superposition</strong>: The total displacement <span class="arithmatex">\(\eta_{\text{total}}\)</span> is the sum of individual wave contributions. For four sources, symmetry creates a complex pattern:</p>
+</li>
+<li>
+<p><strong>Constructive Interference</strong>: Bright red/blue regions where waves align (e.g., center for a square).</p>
+</li>
+<li>
+<p><strong>Destructive Interference</strong>: White regions where waves cancel (e.g., along diagonals or midpoints).</p>
+</li>
+<li>
+<p><strong>Parameters</strong>: Same <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(\lambda\)</span>, and <span class="arithmatex">\(f\)</span> ensure coherence, amplifying interference effects.</p>
+</li>
+<li><strong>Polygon Choice</strong>: A square produces a grid-like pattern due to pairwise symmetry; other polygons (e.g., triangle, pentagon) would alter node spacing.</li>
+</ul>
+<h3 id="graphical-representation">Graphical Representation</h3>
+<ul>
+<li><strong>Static Plot</strong>: Shows a snapshot at <span class="arithmatex">\(t = 0\)</span>, with red (positive) and blue (negative) peaks indicating constructive interference, and white areas showing destructive interference.</li>
+<li><strong>Animation (Optional)</strong>: Uncomment to see the pattern evolve over time, revealing wave propagation.</li>
+</ul>
+<hr/>
+<h2 id="discussion">Discussion</h2>
+<p>The square arrangement creates a symmetrical interference pattern, with maxima and minima forming a lattice-like structure. This reflects how wave phases depend on distance <span class="arithmatex">\(r_i\)</span> from each source. Applications include:
+- <strong>Acoustics</strong>: Speaker arrays creating sound zones.
+- <strong>Optics</strong>: Diffraction gratings.
+- <strong>Oceanography</strong>: Wave interactions from multiple sources (e.g., ships).</p>
+<p>Limitations include assuming a 2D surface and no damping. Extending to 3D, varying phases, or adding attenuation could enrich the model.</p>
+<p>Let me know if you’d like an HTML version or further enhancements!</p>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
