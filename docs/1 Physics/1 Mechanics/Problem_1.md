@@ -3,6 +3,9 @@ Let’s dive into this investigation of how the range of a projectile depends on
 
 ---
 
+[Simulation](project_motion.html)
+
+
 ### 1. Theoretical Foundation
 
 Projectile motion is a classic two-dimensional problem governed by Newton’s laws under constant gravitational acceleration. Let’s derive the equations from first principles.
@@ -91,6 +94,8 @@ This model simplifies real-world scenarios but can be adapted:
   - **Space**: Rockets use initial angles, but thrust and gravity variations dominate.
 
 ---
+
+
 
 ### 4. Implementation
 
