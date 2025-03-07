@@ -143,3 +143,5 @@ print(f"Maximum range {R[max_idx]:.2f} m at {theta_deg[max_idx]}°")
 The range’s dependence on $\theta$ via $\sin 2\theta$ is both elegant and practical, peaking at 45° under ideal conditions. Variations in $v_0$ and $g$ amplify or shrink this relationship, while real-world factors like height or drag enrich the problem. This blend of theory, analysis, and simulation makes projectile motion a timeless physics gem.
 
 Let me know if you’d like to tweak parameters, generate a specific plot, or dive deeper into any part!
+
+[def]: project_motion.html
