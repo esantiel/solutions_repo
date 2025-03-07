@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payload Trajectories Near Earth</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+    </style>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Payload Trajectories Near Earth (200 km Altitude)</h1>
+    <div class="controls">
+        <label for="velocity">Initial Velocity (km/s): </label>
+        <input type="number" id="velocity" value="7.8" min="5" max="15" step="0.1" onchange="updateTrajectory()">
+        <br><br>
+        <p>Escape Velocity at 200 km: ~11.0 km/s</p>
+    </div>
+
+    <canvas id="trajectoryChart"></canvas>
+
+    <script>
+        // Constants
+        const G = 6.67430e-11;  // m^3 kg^-1 s^-2
+        const M = 5.972e24;     // kg (Earth mass)
+        const R_earth = 6.371e6;  // m (Earth radius)
+        const h = 200e3;        // altitude 200 km
+        const r0 = R_earth + h; // initial radius
+        const v_esc = Math.sqrt(2 * G * M / r0) / 1000;  // escape velocity in km/s
+
+        // Gravitational acceleration
+        function gravity(r) {
+            const r_mag = Math.sqrt(r[0] ** 2 + r[1] ** 2);
+            const factor = -G * M / (r_mag ** 3);
+            return [factor * r[0], factor * r[1]];
+        }
+
+        // RK4 derivative
+        function deriv(state, t) {
+            const [x, y, vx, vy] = state;
+            const [ax, ay] = gravity([x, y]);
+            return [vx, vy, ax, ay];
+        }
+
+        // RK4 step
+        function rk4Step(state, t, dt) {
+            const k1 = deriv(state, t);
+            const k2 = deriv(state + 0.5 * dt * k1.map(v => v), t + 0.5 * dt);
+            const k3 = deriv(state + 0.5 * dt * k2.map(v => v), t + 0.5 * dt);
+            const k4 = deriv(state + dt * k3.map(v => v), t + dt);
+            return state.map((s, i) => s + (dt / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+        }
+
+        // Initialize chart
+        const ctx = document.getElementById('trajectoryChart').getContext('2d');
+        const trajectoryChart = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: [] },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'X (km)' } },
+                    y: { title: { display: true, text: 'Y (km)' } }
+                },
+                plugins: { legend: { display: true } },
+                aspectRatio: 1
+            }
+        });
+
+        // Update trajectory
+        function updateTrajectory() {
+            const v0_km = parseFloat(document.getElementById('velocity').value);
+            const v0 = v0_km * 1000;  // convert to m/s
+
+            // Simulation parameters
+            const dt = 10;  // seconds
+            const t_max = 20000;  // seconds
+            let state = [r0, 0, 0, v0];  // [x, y, vx, vy] in meters
+            const path = [[state[0] / 1000, state[1] / 1000]];  // km for plotting
+
+            // Simulate
+            for (let t = dt; t < t_max; t += dt) {
+                state = rk4Step(state, t, dt);
+                const r = Math.sqrt(state[0] ** 2 + state[1] ** 2);
+                path.push([state[0] / 1000, state[1] / 1000]);
+                if (r > 5 * R_earth) break;  // stop if too far
+            }
+
+            // Energy check
+            const E = 0.5 * v0 ** 2 - G * M / r0;
+            let type = E < 0 ? "Elliptical" : (E === 0 ? "Parabolic" : "Hyperbolic");
+
+            // Earth circle
+            const theta = Array.from({ length: 100 }, (_, i) => i * 2 * Math.PI / 99);
+            const earthX = theta.map(t => (R_earth / 1000) * Math.cos(t));
+            const earthY = theta.map(t => (R_earth / 1000) * Math.sin(t));
+
+            // Update chart
+            trajectoryChart.data.datasets = [
+                {
+                    label: 'Earth',
+                    data: earthX.map((x, i) => ({ x, y: earthY[i] })),
+                    backgroundColor: 'lightblue',
+                    showLine: true,
+                    pointRadius: 0,
+                    fill: true
+                },
+                {
+                    label: `${type} Trajectory (v = ${v0_km} km/s)`,
+                    data: path.map(p => ({ x: p[0], y: p[1] })),
+                    borderColor: type === "Elliptical" ? "blue" : type === "Parabolic" ? "green" : "red",
+                    showLine: true,
+                    pointRadius: 0
+                }
+            ];
+            trajectoryChart.update();
+
+            console.log(`Specific Energy: ${E.toExponential(2)} J/kg, Type: ${type}`);
+        }
+
+        // Initial render
+        updateTrajectory();
+    </script>
+</body>
+</html>
