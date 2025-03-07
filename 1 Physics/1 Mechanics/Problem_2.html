@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forced Damped Pendulum Dynamics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 10px auto;
+        }
+    </style>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Forced Damped Pendulum Dynamics</h1>
+    <div class="controls">
+        <label for="gamma">Damping (γ): </label>
+        <input type="number" id="gamma" value="0.5" min="0" max="2" step="0.1" onchange="updateSimulation()">
+        <br><br>
+        <label for="f">Driving Amplitude (f): </label>
+        <input type="number" id="f" value="1.2" min="0" max="3" step="0.1" onchange="updateSimulation()">
+        <br><br>
+        <label for="omega">Driving Frequency (ω): </label>
+        <input type="number" id="omega" value="1.5" min="0.5" max="3" step="0.1" onchange="updateSimulation()">
+    </div>
+
+    <canvas id="timeSeriesChart"></canvas>
+    <canvas id="phasePortraitChart"></canvas>
+    <canvas id="poincareChart"></canvas>
+
+    <script>
+        // Pendulum parameters
+        const g = 9.8;  // gravity (m/s^2)
+        const L = 1.0;  // length (m)
+        const omega0 = Math.sqrt(g / L);  // natural frequency
+
+        // RK4 solver
+        function rk4(state, t, dt, gamma, f, omega) {
+            const [theta, v] = state;
+            const deriv = (s, t) => [
+                s[1],
+                -omega0 * omega0 * Math.sin(s[0]) - gamma * s[1] + f * Math.cos(omega * t)
+            ];
+
+            const k1 = deriv(state, t);
+            const k2 = deriv([theta + 0.5 * dt * k1[0], v + 0.5 * dt * k1[1]], t + 0.5 * dt);
+            const k3 = deriv([theta + 0.5 * dt * k2[0], v + 0.5 * dt * k2[1]], t + 0.5 * dt);
+            const k4 = deriv([theta + dt * k3[0], v + dt * k3[1]], t + dt);
+
+            return [
+                theta + (dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+                v + (dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])
+            ];
+        }
+
+        // Initialize charts
+        const timeSeriesCtx = document.getElementById('timeSeriesChart').getContext('2d');
+        const phasePortraitCtx = document.getElementById('phasePortraitChart').getContext('2d');
+        const poincareCtx = document.getElementById('poincareChart').getContext('2d');
+
+        const timeSeriesChart = new Chart(timeSeriesCtx, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Angle (θ)', data: [], borderColor: 'blue', fill: false }] },
+            options: { scales: { x: { title: { display: true, text: 'Time (s)' } }, y: { title: { display: true, text: 'Angle (rad)' } } } }
+        });
+
+        const phasePortraitChart = new Chart(phasePortraitCtx, {
+            type: 'scatter',
+            data: { datasets: [{ label: 'Phase Space', data: [], borderColor: 'red', showLine: true, pointRadius: 0 }] },
+            options: { scales: { x: { title: { display: true, text: 'Angle (rad)' } }, y: { title: { display: true, text: 'Velocity (rad/s)' } } } }
+        });
+
+        const poincareChart = new Chart(poincareCtx, {
+            type: 'scatter',
+            data: { datasets: [{ label: 'Poincaré Section', data: [], backgroundColor: 'green', pointRadius: 3 }] },
+            options: { scales: { x: { title: { display: true, text: 'Angle (rad)' } }, y: { title: { display: true, text: 'Velocity (rad/s)' } } } }
+        });
+
+        // Simulation and update function
+        function updateSimulation() {
+            const gamma = parseFloat(document.getElementById('gamma').value);
+            const f = parseFloat(document.getElementById('f').value);
+            const omega = parseFloat(document.getElementById('omega').value);
+
+            // Time array and initial conditions
+            const tMax = 50;
+            const dt = 0.05;
+            const t = Array.from({ length: Math.floor(tMax / dt) + 1 }, (_, i) => i * dt);
+            let state = [0.1, 0];  // [theta, v]
+            const thetaValues = [];
+            const vValues = [];
+            const poincarePoints = [];
+
+            // Simulate using RK4
+            for (let i = 0; i < t.length; i++) {
+                thetaValues.push(state[0]);
+                vValues.push(state[1]);
+                // Sample Poincaré section at driving period
+                const T = 2 * Math.PI / omega;
+                if (Math.abs(t[i] % T) < dt / 2) {
+                    poincarePoints.push({ x: state[0], y: state[1] });
+                }
+                state = rk4(state, t[i], dt, gamma, f, omega);
+            }
+
+            // Update time series chart
+            timeSeriesChart.data.labels = t;
+            timeSeriesChart.data.datasets[0].data = thetaValues;
+            timeSeriesChart.data.datasets[0].label = `γ=${gamma}, f=${f}, ω=${omega}`;
+            timeSeriesChart.update();
+
+            // Update phase portrait chart
+            phasePortraitChart.data.datasets[0].data = thetaValues.map((theta, i) => ({ x: theta, y: vValues[i] }));
+            phasePortraitChart.update();
+
+            // Update Poincaré section chart
+            poincareChart.data.datasets[0].data = poincarePoints;
+            poincareChart.update();
+        }
+
+        // Initial render
+        updateSimulation();
+    </script>
+</body>
+</html>
