@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interference Patterns on Water Surface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px;
+        }
+        canvas {
+            border: 1px solid black;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interference Patterns from Four Sources (Square)</h1>
+    <div class="controls">
+        <label for="wavelength">Wavelength (m): </label>
+        <input type="number" id="wavelength" value="0.5" min="0.1" max="2" step="0.1" onchange="updatePattern()">
+        <br><br>
+        <label for="time">Time (s): </label>
+        <input type="range" id="time" value="0" min="0" max="1" step="0.01" oninput="updatePattern()">
+    </div>
+
+    <canvas id="interferenceCanvas" width="600" height="600"></canvas>
+
+    <script>
+        // Constants
+        const A = 1.0;  // amplitude (m)
+        const f = 2.0;  // frequency (Hz)
+        const omega = 2 * Math.PI * f;
+
+        // Source positions (square vertices, side length 2 m)
+        const sources = [
+            [1, 1], [1, -1], [-1, -1], [-1, 1]
+        ];
+
+        // Canvas setup
+        const canvas = document.getElementById('interferenceCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Coordinate mapping (-2 to 2 m)
+        const scale = width / 4;  // 4 m across canvas
+
+        // Color mapping function (red-blue gradient)
+        function getColor(value) {
+            const normalized = (value + 4) / 8;  // Map -4 to 4 to 0 to 1
+            const r = Math.floor((1 - normalized) * 255);  // Red for negative
+            const b = Math.floor(normalized * 255);       // Blue for positive
+            return `rgb(${r}, 0, ${b})`;
+        }
+
+        // Update interference pattern
+        function updatePattern() {
+            const lambda = parseFloat(document.getElementById('wavelength').value);
+            const t = parseFloat(document.getElementById('time').value);
+            const k = 2 * Math.PI / lambda;
+
+            // Create image data
+            const imageData = ctx.createImageData(width, height);
+
+            for (let px = 0; px < width; px++) {
+                for (let py = 0; py < height; py++) {
+                    const x = (px - width / 2) / scale;  // Map to -2 to 2 m
+                    const y = (height / 2 - py) / scale; // Flip y-axis
+
+                    // Calculate total displacement
+                    let eta_total = 0;
+                    for (let [xs, ys] of sources) {
+                        const r = Math.sqrt((x - xs) ** 2 + (y - ys) ** 2);
+                        eta_total += A * Math.cos(k * r - omega * t);
+                    }
+
+                    // Color based on displacement
+                    const color = getColor(eta_total);
+                    const idx = (py * width + px) * 4;
+                    const [r, g, b] = color.match(/\d+/g).map(Number);
+                    imageData.data[idx] = r;     // Red
+                    imageData.data[idx + 1] = g; // Green
+                    imageData.data[idx + 2] = b; // Blue
+                    imageData.data[idx + 3] = 255; // Alpha
+                }
+            }
+
+            // Draw image data
+            ctx.putImageData(imageData, 0, 0);
+
+            // Draw sources
+            ctx.fillStyle = 'black';
+            for (let [xs, ys] of sources) {
+                const px = (xs + 2) * scale;
+                const py = (2 - ys) * scale;  // Flip y for canvas
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        // Initial render
+        updatePattern();
+
+        // Optional animation (uncomment to enable)
+        /*
+        function animate() {
+            const t = (Date.now() % 1000) / 1000;  // Loop 0 to 1 s
+            document.getElementById('time').value = t;
+            updatePattern();
+            requestAnimationFrame(animate);
+        }
+        animate();
+        */
+    </script>
+</body>
+</html>
