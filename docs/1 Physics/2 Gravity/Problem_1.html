@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Period and Radius</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 10px auto;
+        }
+    </style>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Orbital Period and Radius (Kepler's Third Law)</h1>
+    <div class="controls">
+        <label for="mass">Central Mass (kg): </label>
+        <input type="number" id="mass" value="1.989e30" step="1e28" onchange="updateSimulation()">
+        <br><br>
+        <button onclick="toggleUnits()">Toggle Units (days/m vs. years/AU)</button>
+    </div>
+
+    <canvas id="keplerChart"></canvas>
+    <canvas id="orbitChart"></canvas>
+
+    <script>
+        // Constants
+        const G = 6.67430e-11;  // gravitational constant (m^3 kg^-1 s^-2)
+        let useDaysMeters = true;  // Toggle between days/m and years/AU
+
+        // Conversion factors
+        const secToDays = 1 / (24 * 3600);
+        const mToAU = 1 / 1.496e11;
+        const secToYears = 1 / (365.25 * 24 * 3600);
+
+        // Orbital period function (in seconds)
+        function orbitalPeriod(r, M) {
+            return Math.sqrt((4 * Math.PI ** 2 * r ** 3) / (G * M));
+        }
+
+        // Initialize charts
+        const keplerCtx = document.getElementById('keplerChart').getContext('2d');
+        const orbitCtx = document.getElementById('orbitChart').getContext('2d');
+
+        const keplerChart = new Chart(keplerCtx, {
+            type: 'scatter',
+            data: { datasets: [] },
+            options: {
+                scales: {
+                    x: { type: 'logarithmic', title: { display: true, text: 'Orbital Radius cubed (m³)' } },
+                    y: { type: 'logarithmic', title: { display: true, text: 'Orbital Period squared (days²)' } }
+                },
+                plugins: { legend: { display: true } }
+            }
+        });
+
+        const orbitChart = new Chart(orbitCtx, {
+            type: 'scatter',
+            data: { datasets: [] },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'X (m)' } },
+                    y: { title: { display: true, text: 'Y (m)' } }
+                },
+                plugins: { legend: { display: true } },
+                aspectRatio: 1
+            }
+        });
+
+        // Real-world examples
+        const bodies = [
+            { name: "Moon", r: 3.844e8, T: 27.32 * 24 * 3600, M: 5.972e24 },
+            { name: "Earth", r: 1.496e11, T: 365.25 * 24 * 3600, M: 1.989e30 },
+            { name: "Mars", r: 2.279e11, T: 687 * 24 * 3600, M: 1.989e30 }
+        ];
+
+        // Update simulation
+        function updateSimulation() {
+            const M = parseFloat(document.getElementById('mass').value);
+
+            // Generate r values (logarithmic scale)
+            const rValues = Array.from({ length: 100 }, (_, i) => 10 ** (7 + i * 5 / 99));
+            const TValues = rValues.map(r => orbitalPeriod(r, M));
+
+            // Convert units based on toggle
+            const rCubed = rValues.map(r => r ** 3);
+            let TScaled, rUnit, TUnit;
+            if (useDaysMeters) {
+                TScaled = TValues.map(T => (T * secToDays) ** 2);
+                rUnit = 'm³';
+                TUnit = 'days²';
+            } else {
+                TScaled = TValues.map(T => (T * secToYears) ** 2);
+                rCubed = rValues.map(r => (r * mToAU) ** 3);
+                rUnit = 'AU³';
+                TUnit = 'years²';
+            }
+
+            // Update Kepler chart
+            keplerChart.data.datasets = [
+                {
+                    label: `T² vs r³ (M = ${M.toExponential(2)} kg)`,
+                    data: rCubed.map((r3, i) => ({ x: r3, y: TScaled[i] })),
+                    borderColor: 'blue',
+                    showLine: true,
+                    pointRadius: 0
+                }
+            ];
+            bodies.forEach(body => {
+                const TCalc = orbitalPeriod(body.r, body.M);
+                const T2 = useDaysMeters ? (TCalc * secToDays) ** 2 : (TCalc * secToYears) ** 2;
+                const r3 = useDaysMeters ? body.r ** 3 : (body.r * mToAU) ** 3;
+                keplerChart.data.datasets.push({
+                    label: body.name,
+                    data: [{ x: r3, y: T2 }],
+                    pointRadius: 5,
+                    backgroundColor: 'red'
+                });
+            });
+            keplerChart.options.scales.x.title.text = `Orbital Radius cubed (${rUnit})`;
+            keplerChart.options.scales.y.title.text = `Orbital Period squared (${TUnit})`;
+            keplerChart.update();
+
+            // Update orbit chart
+            const orbitDatasets = bodies.map(body => {
+                const theta = Array.from({ length: 100 }, (_, i) => i * 2 * Math.PI / 99);
+                const x = theta.map(t => body.r * Math.cos(t));
+                const y = theta.map(t => body.r * Math.sin(t));
+                return {
+                    label: `${body.name} (r=${(body.r / 1e6).toFixed(1)} Mm)`,
+                    data: x.map((xi, i) => ({ x: xi, y: y[i] })),
+                    borderColor: ['red', 'green', 'purple'][bodies.indexOf(body)],
+                    showLine: true,
+                    pointRadius: 0
+                };
+            });
+            orbitDatasets.push({
+                label: 'Central Body',
+                data: [{ x: 0, y: 0 }],
+                pointRadius: 5,
+                backgroundColor: 'black'
+            });
+            orbitChart.data.datasets = orbitDatasets;
+            orbitChart.update();
+        }
+
+        // Toggle units between days/meters and years/AU
+        function toggleUnits() {
+            useDaysMeters = !useDaysMeters;
+            updateSimulation();
+        }
+
+        // Initial render
+        updateSimulation();
+    </script>
+</body>
+</html>
