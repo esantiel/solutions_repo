@@ -3,9 +3,6 @@ Let’s dive into this investigation of how the range of a projectile depends on
 
 ---
 
-[Simulation](project_motion.html)
-
-
 ### 1. Theoretical Foundation
 
 Projectile motion is a classic two-dimensional problem governed by Newton’s laws under constant gravitational acceleration. Let’s derive the equations from first principles.
@@ -37,6 +34,11 @@ Using kinematics (or integrating the accelerations), the velocity and position a
 These are parametric equations describing a parabolic trajectory. The family of solutions emerges from varying $v_0$, $\theta$, and $g$. For instance, a higher $v_0$ stretches the parabola, while a larger $g$ compresses it vertically.
 
 ---
+
+
+[Simulation](Problem_1.html)
+
+
 
 ### 2. Analysis of the Range
 
@@ -145,3 +147,4 @@ The range’s dependence on $\theta$ via $\sin 2\theta$ is both elegant and prac
 Let me know if you’d like to tweak parameters, generate a specific plot, or dive deeper into any part!
 
 [def]: project_motion.html
+[def2]: project_motion.html
