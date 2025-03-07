@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Range vs. Angle of Projection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .controls {
+            margin: 20px;
+        }
+    </style>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Range vs. Angle of Projection</h1>
+    <div class="controls">
+        <label for="v0">Initial Velocity (v₀, m/s): </label>
+        <input type="number" id="v0" value="20" min="1" step="1" onchange="updateChart()">
+        <br><br>
+        <label for="g">Gravity (g, m/s²): </label>
+        <input type="number" id="g" value="9.8" min="0.1" step="0.1" onchange="updateChart()">
+    </div>
+    <canvas id="rangeChart"></canvas>
+
+    <script>
+        // Get canvas context
+        const ctx = document.getElementById('rangeChart').getContext('2d');
+        
+        // Initialize chart
+        let chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Angles
+                datasets: [{
+                    label: 'Range (m)',
+                    data: [], // Ranges
+                    borderColor: 'blue',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Angle of Projection (degrees)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Range (meters)' },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { display: true }
+                }
+            }
+        });
+
+        // Function to calculate range and update chart
+        function updateChart() {
+            const v0 = parseFloat(document.getElementById('v0').value);
+            const g = parseFloat(document.getElementById('g').value);
+
+            // Generate angles from 0 to 90 degrees
+            const angles = Array.from({ length: 91 }, (_, i) => i); // 0 to 90
+            const ranges = angles.map(theta => {
+                const thetaRad = theta * Math.PI / 180; // Convert to radians
+                return (v0 * v0 * Math.sin(2 * thetaRad)) / g; // Range formula
+            });
+
+            // Update chart data
+            chart.data.labels = angles;
+            chart.data.datasets[0].data = ranges;
+            chart.data.datasets[0].label = `v₀ = ${v0} m/s, g = ${g} m/s²`;
+            chart.update();
+
+            // Find and log maximum range
+            const maxRange = Math.max(...ranges);
+            const maxAngle = angles[ranges.indexOf(maxRange)];
+            console.log(`Maximum range ${maxRange.toFixed(2)} m at ${maxAngle}°`);
+        }
+
+        // Initial chart render
+        updateChart();
+    </script>
+</body>
+</html>
