@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape and Cosmic Velocities</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+    </style>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Escape and Cosmic Velocities</h1>
+    <div class="controls">
+        <label for="body">Select Celestial Body: </label>
+        <select id="body" onchange="updateChart()">
+            <option value="Earth">Earth</option>
+            <option value="Mars">Mars</option>
+            <option value="Jupiter">Jupiter</option>
+        </select>
+    </div>
+
+    <canvas id="velocityChart"></canvas>
+
+    <script>
+        // Constants
+        const G = 6.67430e-11;  // gravitational constant (m^3 kg^-1 s^-2)
+        const M_sun = 1.989e30;  // Sun's mass (kg)
+
+        // Celestial body data
+        const bodies = {
+            "Earth": { "M": 5.972e24, "R": 6.371e6, "d": 1.496e11 },
+            "Mars": { "M": 6.417e23, "R": 3.389e6, "d": 2.279e11 },
+            "Jupiter": { "M": 1.898e27, "R": 6.991e7, "d": 7.785e11 }
+        };
+
+        // Velocity calculations (in km/s)
+        function firstCosmic(M, R) {
+            return Math.sqrt(G * M / R) / 1000;
+        }
+
+        function secondCosmic(M, R) {
+            return Math.sqrt(2 * G * M / R) / 1000;
+        }
+
+        function thirdCosmic(M, R, d) {
+            const v2 = secondCosmic(M, R) * 1000;  // m/s
+            const v_esc_sun = Math.sqrt(2 * G * M_sun / d) / 1000;  // km/s from Sun at d
+            const v_orb = Math.sqrt(G * M_sun / d) / 1000;  // km/s orbital speed
+            return Math.sqrt(v2 * v2 + (v_esc_sun - v_orb) ** 2);
+        }
+
+        // Initialize chart
+        const ctx = document.getElementById('velocityChart').getContext('2d');
+        const velocityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1st Cosmic (Orbit)', '2nd Cosmic (Escape)', '3rd Cosmic (Solar Escape)'],
+                datasets: []
+            },
+            options: {
+                scales: {
+                    y: { title: { display: true, text: 'Velocity (km/s)' }, beginAtZero: true },
+                    x: { title: { display: true, text: 'Velocity Type' } }
+                },
+                plugins: { legend: { display: true } }
+            }
+        });
+
+        // Update chart based on selected body
+        function updateChart() {
+            const selectedBody = document.getElementById('body').value;
+            const data = bodies[selectedBody];
+
+            const v1 = firstCosmic(data.M, data.R);
+            const v2 = secondCosmic(data.M, data.R);
+            const v3 = thirdCosmic(data.M, data.R, data.d);
+
+            velocityChart.data.datasets = [{
+                label: `${selectedBody} Velocities`,
+                data: [v1, v2, v3],
+                backgroundColor: ['blue', 'green', 'red'],
+                borderColor: ['darkblue', 'darkgreen', 'darkred'],
+                borderWidth: 1
+            }];
+            velocityChart.options.scales.y.title.text = 'Velocity (km/s)';
+            velocityChart.update();
+
+            // Log values to console for reference
+            console.log(`${selectedBody}: v1 = ${v1.toFixed(2)} km/s, v2 = ${v2.toFixed(2)} km/s, v3 = ${v3.toFixed(2)} km/s`);
+        }
+
+        // Initial render
+        updateChart();
+    </script>
+</body>
+</html>
