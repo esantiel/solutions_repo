@@ -89,7 +89,6 @@ Beyond small angles, $\sin\theta$ introduces nonlinearity, leading to complex be
 #### Python Simulation
 We’ll use the 4th-order Runge-Kutta (RK4) method to solve the nonlinear equation numerically and visualize the results.
 
-[Animation](Problem_2.py)
 
 ```python
 import numpy as np
