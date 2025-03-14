@@ -31,7 +31,7 @@ $$\frac{d^2\theta}{dt^2} + \gamma \frac{d\theta}{dt} + \omega_0^2 \sin\theta = f
 
 This is a nonlinear second-order differential equation due to $\sin\theta$.
 
-![alt text](maginary-part-of-the-homogeneous-governing-equation-AR-10-1.png)
+![alt text](SPROTTA.gif)
 
 
 #### Small-Angle Approximation
