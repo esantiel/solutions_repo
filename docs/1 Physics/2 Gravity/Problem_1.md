@@ -60,6 +60,7 @@ where $k = \frac{4\pi^2}{G M}$ is a constant for a given central mass $M$. This 
 
 ---
 
+
 ### 2. Implications for Astronomy
 
 - **Mass Determination**: If $T$ and $r$ are measured (e.g., via observation), $M$ can be calculated:
