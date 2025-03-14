@@ -66,7 +66,7 @@ where $k = \frac{4\pi^2}{G M}$ is a constant for a given central mass $M$. This 
 - **Mass Determination**: If $T$ and $r$ are measured (e.g., via observation), $M$ can be calculated:
 
 
-  $$M = \frac{4\pi^2 r^3}{G T^2}$$
+   $$M = \frac{4\pi^2 r^3}{G T^2}$$
 
 
   This is how we estimate the Sun’s mass using Earth’s orbit or Earth’s mass using the Moon’s orbit.
@@ -74,7 +74,7 @@ where $k = \frac{4\pi^2}{G M}$ is a constant for a given central mass $M$. This 
 - **Distance Calculation**: Knowing $T$ and $M$, solve for $r$:
 
 
-  $$r = \left( \frac{G M T^2}{4\pi^2} \right)^{1/3}$$
+   $$r = \left( \frac{G M T^2}{4\pi^2} \right)^{1/3}$$
 
 
 - **System Scaling**: For planets orbiting the Sun, $T^2 / r^3$ is constant, allowing comparisons across the Solar System.
