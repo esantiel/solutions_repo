@@ -55,6 +55,8 @@ Phase $\phi = \tan^{-1}\left(\frac{\gamma \omega}{\omega_0^2 - \omega^2}\right)$
 #### Nonlinear Case
 Beyond small angles, $\sin\theta$ introduces nonlinearity, leading to complex behaviors like chaos, which we’ll explore numerically.
 
+![alt text](maginary-part-of-the-homogeneous-governing-equation-AR-10.png)
+
 ---
 
 ### 2. Analysis of Dynamics
