@@ -14,7 +14,7 @@
 
 ## Task Breakdown
 
-<span style="font-family: Arial; font-size: 24px;">[Simulation](Problem_1.html)</span>
+<span style="font-family: Arial; font-size: 20px;">[Simulation](Problem_1.html)</span>
 
 ### 1. Derivation of the Relationship
 
@@ -25,6 +25,8 @@ $$F_g = \frac{G M m}{r^2}$$
 
 where $G$ is the gravitational constant ($6.67430 \times 10^{-11} \, \text{m}^3 \text{kg}^{-1} \text{s}^{-2}$).
 
+![alt text](5bb591401167df0772f65905cf5166ff.gif)
+
 #### Centripetal Force
 For circular motion with orbital speed $v$ and period $T$:
 
@@ -33,6 +35,8 @@ $$v = \frac{2\pi r}{T}$$
 Centripetal force:
 
 $$F_c = \frac{m v^2}{r} = \frac{m}{r} \left( \frac{2\pi r}{T} \right)^2 = \frac{4\pi^2 m r}{T^2}$$
+
+![alt text](centripetalforce0.gif)
 
 #### Equate Forces
 $$\frac{G M m}{r^2} = \frac{4\pi^2 m r}{T^2}$$
@@ -50,6 +54,9 @@ Thus:
 $$T^2 = k r^3$$
 
 where $k = \frac{4\pi^2}{G M}$ is a constant for a given central mass $M$. This is Kepler’s Third Law for circular orbits.
+
+
+![alt text](07b61598212243.5ed7268f8ea6e.gif)
 
 ---
 
