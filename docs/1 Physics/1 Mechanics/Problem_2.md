@@ -55,6 +55,8 @@ $$A = \frac{f}{\sqrt{(\omega_0^2 - \omega^2)^2 + (\gamma \omega)^2}}$$
 
 Phase $\phi = \tan^{-1}\left(\frac{\gamma \omega}{\omega_0^2 - \omega^2}\right)$. Resonance amplifies energy input when driving frequency matches the natural frequency, adjusted by damping.
 
+![alt text](2e4e6e7059571a452ace5fdbfbe2e0e5.jpg)
+
 #### Nonlinear Case
 Beyond small angles, $\sin\theta$ introduces nonlinearity, leading to complex behaviors like chaos, which we’ll explore numerically.
 
