@@ -1,12 +1,6 @@
 # Problem 2
-Let’s dive into the fascinating dynamics of a forced damped pendulum. This system is a treasure trove of physical phenomena, blending theory, computation, and real-world relevance. Below, I’ll provide a comprehensive response in Markdown format, including a Python script for simulation, detailed explanations, and visualizations as requested. I’ll also embed the code in a way that’s ready for a notebook or standalone use.
-
----
 
 # Investigating the Dynamics of a Forced Damped Pendulum
-
-## Motivation
-The forced damped pendulum is a nonlinear oscillator that evolves from the simple pendulum by adding damping (energy dissipation) and external periodic forcing. This introduces complexity, revealing behaviors like resonance, quasiperiodicity, and chaos. These dynamics mirror real-world systems—think suspension bridges swaying in the wind, energy harvesters capturing vibrations, or even chaotic weather patterns. By tweaking parameters like damping, forcing amplitude, and frequency, we unlock a spectrum of motions that are both mathematically intriguing and practically significant.
 
 
 [Simulation](Problem_2.html)
