@@ -1,12 +1,23 @@
 # Problem 1
-Let’s explore the relationship between the orbital period and orbital radius, a beautiful manifestation of Kepler’s Third Law, and bring it to life with theory, examples, and a computational model. Below is a comprehensive response in Markdown format, including a Python script for simulation and visualization, fulfilling all deliverables.
 
----
 
 # Orbital Period and Orbital Radius
 
-## Motivation
-Kepler’s Third Law reveals a deep connection between the time a body takes to orbit (its period) and its distance from the central mass (its radius). Expressed as $T^2 \propto r^3$ for circular orbits, this relationship emerges from Newton’s law of gravitation and circular motion dynamics. It’s a key tool in astronomy, enabling us to measure planetary masses, map orbits, and understand gravitational systems—from satellites to exoplanets. Its elegance lies in its simplicity, yet it unlocks profound insights into the cosmos.
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video</title>
+</head>
+<body>
+    <h1>Embedded YouTube Video</h1>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/bcvnfQlz1x4?si=bl428S7Xqp5I51gK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</body>
+</html>
 
 
 [Simulation](Problem_1.html)
