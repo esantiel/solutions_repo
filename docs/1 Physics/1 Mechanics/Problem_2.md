@@ -31,6 +31,9 @@ $$\frac{d^2\theta}{dt^2} + \gamma \frac{d\theta}{dt} + \omega_0^2 \sin\theta = f
 
 This is a nonlinear second-order differential equation due to $\sin\theta$.
 
+![alt text](maginary-part-of-the-homogeneous-governing-equation-AR-10-1.png)
+
+
 #### Small-Angle Approximation
 
 For small $\theta$, $\sin\theta \approx \theta$, simplifying to:
@@ -55,7 +58,7 @@ Phase $\phi = \tan^{-1}\left(\frac{\gamma \omega}{\omega_0^2 - \omega^2}\right)$
 #### Nonlinear Case
 Beyond small angles, $\sin\theta$ introduces nonlinearity, leading to complex behaviors like chaos, which we’ll explore numerically.
 
-![alt text](maginary-part-of-the-homogeneous-governing-equation-AR-10.png)
+
 
 ---
 
