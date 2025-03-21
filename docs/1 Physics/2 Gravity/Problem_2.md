@@ -9,7 +9,6 @@ Let’s dive into the fascinating world of escape velocities and cosmic velociti
 Escape velocity is the minimum speed an object must achieve to break free from a celestial body’s gravitational pull without further propulsion. Building on this, cosmic velocities—first, second, and third—define critical thresholds for orbiting a planet, escaping its gravity, and exiting a star system, respectively. These ideas are the backbone of space exploration, guiding everything from satellite launches to interplanetary missions and dreams of interstellar voyages.
 
 
-[Simulation](Problem_2.html)
 
 
 ## Task Breakdown
