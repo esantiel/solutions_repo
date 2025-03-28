@@ -78,6 +78,24 @@
 <ul class="current">
 <li class="toctree-l2 current"><a class="reference internal current" href="#">Problem 1</a>
 <ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="#equivalent-resistance-using-graph-theory">Equivalent Resistance Using Graph Theory</a>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#motivation">Motivation</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#algorithm-description">Algorithm Description</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#implementation-in-python">Implementation in Python</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#explanation-of-the-algorithm-and-implementation">Explanation of the Algorithm and Implementation</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#test-cases-and-results">Test Cases and Results</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#efficiency-analysis-and-potential-improvements">Efficiency Analysis and Potential Improvements</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#deliverables-summary">Deliverables Summary</a>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -172,6 +190,132 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <h1 id="problem-1">Problem 1</h1>
+<p>Let’s tackle the <strong>Option 2: Advanced Task – Full Implementation</strong> for calculating the equivalent resistance of a circuit using graph theory. We’ll implement the algorithm in Python, using the <code>networkx</code> library for graph manipulation, and test it on three example circuits: simple series, simple parallel, and a nested configuration. The solution will include a detailed explanation, implementation, test cases, and an analysis of efficiency.</p>
+<p><a href="../Problem_1.py">Simulation</a></p>
+<hr/>
+<h2 id="equivalent-resistance-using-graph-theory">Equivalent Resistance Using Graph Theory</h2>
+<h3 id="motivation">Motivation</h3>
+<p>Calculating equivalent resistance is crucial in electrical circuit design, but traditional methods (series and parallel rules) can be cumbersome for complex circuits. Graph theory provides a systematic approach by representing circuits as graphs—nodes as junctions and edges as resistors with weights (resistance values). This method simplifies complex networks, enables automation, and connects electrical engineering with mathematical concepts, benefiting applications like circuit simulation and network optimization.</p>
+<hr/>
+<h3 id="algorithm-description">Algorithm Description</h3>
+<p>The algorithm iteratively simplifies the graph by identifying and reducing series and parallel resistor configurations until a single equivalent resistance remains. Here’s the high-level approach:</p>
+<ol>
+<li><strong>Graph Representation</strong>:</li>
+<li>Nodes represent junctions in the circuit.</li>
+<li>Edges represent resistors, with weights as resistance values.</li>
+<li>
+<p>Input: A graph with two terminal nodes (start and end) between which we calculate the equivalent resistance.</p>
+</li>
+<li>
+<p><strong>Iterative Simplification</strong>:</p>
+</li>
+<li><strong>Series Reduction</strong>: Identify nodes with degree 2 (exactly two neighbors). If a node <span class="arithmatex">\(v\)</span> connects nodes <span class="arithmatex">\(u\)</span> and <span class="arithmatex">\(w\)</span> with resistors <span class="arithmatex">\(R_1\)</span> (between <span class="arithmatex">\(u\)</span> and <span class="arithmatex">\(v\)</span>) and <span class="arithmatex">\(R_2\)</span> (between <span class="arithmatex">\(v\)</span> and <span class="arithmatex">\(w\)</span>), replace with a single edge between <span class="arithmatex">\(u\)</span> and <span class="arithmatex">\(w\)</span> with resistance <span class="arithmatex">\(R_1 + R_2\)</span>, and remove <span class="arithmatex">\(v\)</span>.</li>
+<li><strong>Parallel Reduction</strong>: Identify pairs of nodes connected by multiple edges (parallel resistors). For edges between nodes <span class="arithmatex">\(u\)</span> and <span class="arithmatex">\(v\)</span> with resistances <span class="arithmatex">\(R_1, R_2, \ldots, R_n\)</span>, replace with a single edge with resistance <span class="arithmatex">\(\frac{1}{\frac{1}{R_1} + \frac{1}{R_2} + \cdots + \frac{1}{R_n}}\)</span>.</li>
+<li>
+<p>Repeat until the graph reduces to a single edge between the start and end nodes.</p>
+</li>
+<li>
+<p><strong>Handling Nested Configurations</strong>:</p>
+</li>
+<li>Use a traversal (e.g., DFS) to explore the graph and identify series/parallel patterns.</li>
+<li>For nested configurations, the iterative process naturally handles them by reducing inner series/parallel subgraphs first, working outward.</li>
+</ol>
+<hr/>
+<h3 id="implementation-in-python">Implementation in Python</h3>
+<p>We’ll use the <code>networkx</code> library to represent and manipulate the graph. The implementation will:
+- Accept a graph with resistors as weighted edges.
+- Iteratively simplify the graph.
+- Output the equivalent resistance.</p>
+<h3 id="explanation-of-the-algorithm-and-implementation">Explanation of the Algorithm and Implementation</h3>
+<h4 id="how-it-works">How It Works</h4>
+<ol>
+<li><strong>Graph Representation</strong>:</li>
+<li>We use <code>networkx.MultiGraph</code> to allow multiple edges between nodes (for parallel resistors).</li>
+<li>
+<p>Each edge has a <code>resistance</code> attribute (e.g., <code>G.add_edge(0, 1, resistance=2)</code>).</p>
+</li>
+<li>
+<p><strong>Series Reduction</strong>:</p>
+</li>
+<li>Identify nodes with degree 2 (excluding start and end nodes).</li>
+<li>
+<p>For a node <span class="arithmatex">\(v\)</span> with neighbors <span class="arithmatex">\(u\)</span> and <span class="arithmatex">\(w\)</span>, combine resistances <span class="arithmatex">\(R_1 + R_2\)</span>, add a new edge <span class="arithmatex">\((u, w)\)</span>, and remove <span class="arithmatex">\(v\)</span>.</p>
+</li>
+<li>
+<p><strong>Parallel Reduction</strong>:</p>
+</li>
+<li>Identify pairs of nodes with multiple edges.</li>
+<li>
+<p>Compute the equivalent resistance using the parallel formula <span class="arithmatex">\(\frac{1}{R_{eq}} = \sum \frac{1}{R_i}\)</span>, replace with a single edge, and remove the old edges.</p>
+</li>
+<li>
+<p><strong>Iteration</strong>:</p>
+</li>
+<li>Alternate between series and parallel reductions until the graph reduces to a single edge between the start and end nodes.</li>
+</ol>
+<h4 id="handling-nested-configurations">Handling Nested Configurations</h4>
+<ul>
+<li>The algorithm naturally handles nested configurations by reducing inner patterns first:</li>
+<li>In Test 3, it first reduces the parallel pair <span class="arithmatex">\((2\Omega || 2\Omega) = 1\Omega\)</span> between nodes 0 and 1, and <span class="arithmatex">\((4\Omega || 4\Omega) = 2\Omega\)</span> between nodes 1 and 2.</li>
+<li>Then, it performs a series reduction on the resulting <span class="arithmatex">\(1\Omega + 2\Omega = 3\Omega\)</span>.</li>
+</ul>
+<hr/>
+<h3 id="test-cases-and-results">Test Cases and Results</h3>
+<h4 id="test-1-simple-series">Test 1: Simple Series</h4>
+<ul>
+<li><strong>Graph</strong>: <span class="arithmatex">\(0 \xrightarrow{2\Omega} 1 \xrightarrow{3\Omega} 2\)</span></li>
+<li><strong>Expected</strong>: <span class="arithmatex">\(2 + 3 = 5 \, \Omega\)</span></li>
+<li><strong>Calculated</strong>: <span class="arithmatex">\(5 \, \Omega\)</span></li>
+</ul>
+<h4 id="test-2-simple-parallel">Test 2: Simple Parallel</h4>
+<ul>
+<li><strong>Graph</strong>: Two edges between nodes 0 and 1, each <span class="arithmatex">\(2 \, \Omega\)</span></li>
+<li><strong>Expected</strong>: <span class="arithmatex">\(\frac{1}{\frac{1}{2} + \frac{1}{2}} = 1 \, \Omega\)</span></li>
+<li><strong>Calculated</strong>: <span class="arithmatex">\(1 \, \Omega\)</span></li>
+</ul>
+<h4 id="test-3-nested-configuration">Test 3: Nested Configuration</h4>
+<ul>
+<li><strong>Graph</strong>: <span class="arithmatex">\((2\Omega || 2\Omega)\)</span> in series with <span class="arithmatex">\((4\Omega || 4\Omega)\)</span></li>
+<li><strong>Expected</strong>:</li>
+<li>First parallel: <span class="arithmatex">\(2 || 2 = 1 \, \Omega\)</span></li>
+<li>Second parallel: <span class="arithmatex">\(4 || 4 = 2 \, \Omega\)</span></li>
+<li>Series: <span class="arithmatex">\(1 + 2 = 3 \, \Omega\)</span></li>
+<li><strong>Calculated</strong>: <span class="arithmatex">\(3 \, \Omega\)</span></li>
+</ul>
+<hr/>
+<h3 id="efficiency-analysis-and-potential-improvements">Efficiency Analysis and Potential Improvements</h3>
+<h4 id="efficiency">Efficiency</h4>
+<ul>
+<li><strong>Time Complexity</strong>:</li>
+<li>Series reduction: <span class="arithmatex">\(O(|V|)\)</span> per iteration to find a degree-2 node.</li>
+<li>Parallel reduction: <span class="arithmatex">\(O(|E|)\)</span> to find multi-edges.</li>
+<li>Number of iterations: In the worst case, each iteration removes one node or edge, so up to <span class="arithmatex">\(O(|V| + |E|)\)</span> iterations.</li>
+<li>Total: <span class="arithmatex">\(O((|V| + |E|) \cdot (|V| + |E|))\)</span>, roughly <span class="arithmatex">\(O(|V|^2 + |E|^2)\)</span>.</li>
+<li><strong>Space Complexity</strong>: <span class="arithmatex">\(O(|V| + |E|)\)</span> for storing the graph.</li>
+</ul>
+<h4 id="limitations">Limitations</h4>
+<ul>
+<li>The current implementation assumes the circuit can be reduced using only series and parallel rules, which fails for complex graphs with cycles (e.g., bridge circuits like the Wheatstone bridge).</li>
+<li>It doesn’t handle delta-star transformations, which are needed for non-series-parallel graphs.</li>
+</ul>
+<h4 id="improvements">Improvements</h4>
+<ol>
+<li><strong>Delta-Star Transformation</strong>:</li>
+<li>Add a step to detect delta configurations (three nodes forming a triangle) and convert them to star configurations, allowing further series/parallel reductions.</li>
+<li><strong>Matrix Methods</strong>:</li>
+<li>Use the Laplacian matrix and Kirchhoff’s laws to compute equivalent resistance directly, which handles arbitrary graphs but is more computationally intensive (<span class="arithmatex">\(O(|V|^3)\)</span> for matrix inversion).</li>
+<li><strong>Optimization</strong>:</li>
+<li>Use a priority queue to identify reducible patterns more efficiently.</li>
+<li>Implement cycle detection to handle complex graphs with non-series-parallel structures.</li>
+</ol>
+<hr/>
+<h3 id="deliverables-summary">Deliverables Summary</h3>
+<ul>
+<li><strong>Implementation</strong>: Provided in Python using <code>networkx</code>.</li>
+<li><strong>Test Cases</strong>: Three examples (series, parallel, nested) with expected and calculated results.</li>
+<li><strong>Analysis</strong>: Discussed efficiency and suggested improvements like delta-star transformations.</li>
+</ul>
+<p>This solution demonstrates how graph theory simplifies equivalent resistance calculations, with potential for extension to more complex circuits. Let me know if you’d like to explore additional test cases or improvements!</p>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
