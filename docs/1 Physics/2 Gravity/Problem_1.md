@@ -129,6 +129,4 @@ For circular orbits, $a = r$, so the form holds. This applies to comets, exoplan
 ## Discussion
 The $T^2 \propto r^3$ relationship is a triumph of classical physics, bridging Kepler’s empirical discovery with Newton’s mechanics. It assumes circular orbits and a dominant central mass, but extends robustly to elliptical cases. Limitations include neglecting relativistic effects (e.g., Mercury’s precession) or multi-body interactions, which require perturbations or numerical methods.
 
-The simulation confirms the law across scales—from the Moon to Mars—making it a powerful tool for education and exploration. Adding velocity or elliptical paths could enhance it further.
-
-Let me know if you’d like an HTML version or additional features!
+The simulation confirms the law across scales—from the Moon to Mars—making it a powerful tool for education and exploration.
