@@ -30,6 +30,10 @@ Total displacement is the sum over $N$ sources:
 
 $$\eta_{\text{total}}(x, y, t) = \sum_{i=1}^N A \cos(k r_i - \omega t + \phi_i)$$
 
+
+![alt text](1D_Progressive_Wave-1.gif)
+
+
 ### Steps
 
 #### 1. Select a Regular Polygon
