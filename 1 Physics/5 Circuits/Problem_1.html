@@ -1,92 +1,164 @@
-import networkx as nx
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driven Damped Pendulum Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: white;
+        }
+        .controls {
+            margin: 20px;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+        }
+        label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Driven Damped Pendulum Simulation</h1>
+    <div class="controls">
+        <label for="gamma">Damping (\( \gamma \)):</label>
+        <input type="range" id="gamma" min="0" max="1" step="0.01" value="0.1">
+        <span id="gamma-value">0.1</span><br>
 
-def calculate_equivalent_resistance(G, start_node, end_node):
-    """
-    Calculate the equivalent resistance between start_node and end_node in graph G.
-    G: NetworkX graph with edges having 'resistance' attribute.
-    Returns: Equivalent resistance (float).
-    """
-    # Make a copy to avoid modifying the original graph
-    G = G.copy()
+        <label for="f">Forcing Amplitude (\( f \)):</label>
+        <input type="range" id="f" min="0" max="2" step="0.01" value="0.5">
+        <span id="f-value">0.5</span><br>
 
-    # Continue simplifying until only start_node and end_node remain with one edge
-    while len(G.nodes) > 2 or (len(G.nodes) == 2 and len(G.edges) > 1):
-        # 1. Series reduction: Find nodes with degree 2
-        series_reduced = False
-        for node in list(G.nodes):
-            if node in [start_node, end_node]:
-                continue
-            if G.degree(node) == 2:
-                neighbors = list(G.neighbors(node))
-                u, v = neighbors
-                # Get resistances
-                r1 = G[u][node]['resistance']
-                r2 = G[node][v]['resistance']
-                # Add new edge with combined resistance
-                G.add_edge(u, v, resistance=r1 + r2)
-                # Remove the intermediate node
-                G.remove_node(node)
-                series_reduced = True
-                break
+        <label for="omega">Driving Frequency (\( \omega \)):</label>
+        <input type="range" id="omega" min="0" max="5" step="0.01" value="3.13">
+        <span id="omega-value">3.13</span><br>
 
-        if series_reduced:
-            continue
+        <label for="nonlinear">Nonlinear (\( \sin\theta \)):</label>
+        <input type="checkbox" id="nonlinear" checked>
+    </div>
+    <canvas id="pendulumCanvas" width="600" height="400"></canvas>
 
-        # 2. Parallel reduction: Find pairs of nodes with multiple edges
-        parallel_reduced = False
-        for u, v in G.edges():
-            if G.number_of_edges(u, v) > 1:
-                # Get all edges between u and v
-                edges = G.get_edge_data(u, v)
-                resistances = [data['resistance'] for data in edges.values()]
-                # Calculate equivalent resistance for parallel
-                inv_r_eq = sum(1/r for r in resistances)
-                r_eq = 1 / inv_r_eq
-                # Remove all edges between u and v
-                G.remove_edges_from([(u, v)] * len(resistances))
-                # Add single edge with equivalent resistance
-                G.add_edge(u, v, resistance=r_eq)
-                parallel_reduced = True
-                break
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('pendulumCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
 
-        if not (series_reduced or parallel_reduced):
-            raise ValueError("Graph cannot be reduced further; possible complex configuration not handled.")
+        // Pendulum parameters
+        const g = 9.8;  // gravity (m/s^2)
+        const L = 1.0;  // length (m)
+        const omega0 = Math.sqrt(g / L);  // natural frequency
+        let gamma = 0.1;  // damping
+        let f = 0.5;      // forcing amplitude
+        let omega = omega0;  // driving frequency (set to resonance initially)
+        let useNonlinear = true;  // toggle nonlinear vs linear
 
-    # Final check: Should have one edge between start_node and end_node
-    if len(G.edges) != 1 or not G.has_edge(start_node, end_node):
-        raise ValueError("Reduction failed: Expected one edge between start and end nodes.")
-    
-    return G[start_node][end_node]['resistance']
+        // Initial conditions
+        let theta = 0.1;  // initial angle (rad)
+        let v = 0;        // initial angular velocity (rad/s)
+        let t = 0;        // time
+        const dt = 0.02;  // time step
 
-# Test cases
-def create_test_graphs():
-    # Test 1: Simple Series (R1 = 2Ω, R2 = 3Ω)
-    G1 = nx.MultiGraph()
-    G1.add_edge(0, 1, resistance=2)
-    G1.add_edge(1, 2, resistance=3)
-    print("Test 1: Simple Series (2Ω + 3Ω)")
-    print("Expected: 5Ω")
-    print("Calculated:", calculate_equivalent_resistance(G1, 0, 2))
+        // Canvas scaling
+        const pivotX = width / 2;
+        const pivotY = height / 4;
+        const scale = 150;  // pixels per meter
 
-    # Test 2: Simple Parallel (R1 = 2Ω, R2 = 2Ω)
-    G2 = nx.MultiGraph()
-    G2.add_edge(0, 1, resistance=2)
-    G2.add_edge(0, 1, resistance=2)
-    print("\nTest 2: Simple Parallel (2Ω || 2Ω)")
-    print("Expected: 1Ω")
-    print("Calculated:", calculate_equivalent_resistance(G2, 0, 1))
+        // Control elements
+        const gammaSlider = document.getElementById('gamma');
+        const gammaValue = document.getElementById('gamma-value');
+        const fSlider = document.getElementById('f');
+        const fValue = document.getElementById('f-value');
+        const omegaSlider = document.getElementById('omega');
+        const omegaValue = document.getElementById('omega-value');
+        const nonlinearCheckbox = document.getElementById('nonlinear');
 
-    # Test 3: Nested Configuration (Series of two parallel pairs)
-    # (R1 = 2Ω || R2 = 2Ω) in series with (R3 = 4Ω || R4 = 4Ω)
-    G3 = nx.MultiGraph()
-    G3.add_edge(0, 1, resistance=2)  # R1
-    G3.add_edge(0, 1, resistance=2)  # R2
-    G3.add_edge(1, 2, resistance=4)  # R3
-    G3.add_edge(1, 2, resistance=4)  # R4
-    print("\nTest 3: Nested (2Ω || 2Ω) + (4Ω || 4Ω)")
-    print("Expected: 1Ω + 2Ω = 3Ω")
-    print("Calculated:", calculate_equivalent_resistance(G3, 0, 2))
+        // Update parameters from sliders
+        gammaSlider.addEventListener('input', () => {
+            gamma = parseFloat(gammaSlider.value);
+            gammaValue.textContent = gamma.toFixed(2);
+        });
 
-# Run tests
-if __name__ == "__main__":
-    create_test_graphs()
+        fSlider.addEventListener('input', () => {
+            f = parseFloat(fSlider.value);
+            fValue.textContent = f.toFixed(2);
+        });
+
+        omegaSlider.addEventListener('input', () => {
+            omega = parseFloat(omegaSlider.value);
+            omegaValue.textContent = omega.toFixed(2);
+        });
+
+        nonlinearCheckbox.addEventListener('change', () => {
+            useNonlinear = nonlinearCheckbox.checked;
+        });
+
+        // Physics simulation
+        function updatePendulum() {
+            // Acceleration: d^2theta/dt^2 = -omega0^2 * sin(theta) - gamma * v + f * cos(omega * t)
+            const angle = useNonlinear ? Math.sin(theta) : theta;  // Nonlinear vs linear
+            const accel = -omega0 * omega0 * angle - gamma * v + f * Math.cos(omega * t);
+
+            // Update velocity and angle using Euler method
+            v += accel * dt;
+            theta += v * dt;
+            t += dt;
+        }
+
+        // Drawing the pendulum
+        function drawPendulum() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate bob position
+            const bobX = pivotX + scale * L * Math.sin(theta);
+            const bobY = pivotY + scale * L * Math.cos(theta);
+
+            // Draw pivot
+            ctx.beginPath();
+            ctx.arc(pivotX, pivotY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+
+            // Draw rod
+            ctx.beginPath();
+            ctx.moveTo(pivotX, pivotY);
+            ctx.lineTo(bobX, bobY);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw bob
+            ctx.beginPath();
+            ctx.arc(bobX, bobY, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+
+            // Draw labels
+            ctx.font = '14px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText(`θ = ${(theta * 180 / Math.PI).toFixed(1)}°`, 10, 20);
+            ctx.fillText(`v = ${v.toFixed(2)} rad/s`, 10, 40);
+        }
+
+        // Animation loop
+        function animate() {
+            updatePendulum();
+            drawPendulum();
+            requestAnimationFrame(animate);
+        }
+
+        // Start the simulation
+        animate();
+    </script>
+</body>
+</html>
