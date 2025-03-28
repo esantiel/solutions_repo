@@ -56,8 +56,6 @@ $$T^2 = k r^3$$
 where $k = \frac{4\pi^2}{G M}$ is a constant for a given central mass $M$. This is Kepler’s Third Law for circular orbits.
 
 
-![alt text](07b61598212243.5ed7268f8ea6e.gif)
-
 ---
 
 
