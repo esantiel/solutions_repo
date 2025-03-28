@@ -1,7 +1,7 @@
 # Problem 1
 Let’s tackle the **Option 2: Advanced Task – Full Implementation** for calculating the equivalent resistance of a circuit using graph theory. We’ll implement the algorithm in Python, using the `networkx` library for graph manipulation, and test it on three example circuits: simple series, simple parallel, and a nested configuration. The solution will include a detailed explanation, implementation, test cases, and an analysis of efficiency.
 
-[Simulation](Problem_1.py)
+[Simulation](Problem_1.html)
 
 
 ---
