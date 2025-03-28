@@ -86,5 +86,3 @@ The simulation captures key dynamics:
 - **Escape**: $v \geq v_{\text{esc}}$ sends payloads beyond Earth’s influence, critical for lunar or interplanetary missions.
 
 Limitations include ignoring atmospheric drag, Earth’s oblateness, and other bodies. Adding these or varying initial directions could enhance realism.
-
-Let me know if you’d like an HTML version or further refinements!
