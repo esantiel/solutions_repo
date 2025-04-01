@@ -2,229 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Equivalent Resistance Simulation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit Resistance Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            text-align: center;
-        }
-        canvas {
-            border: 1px solid black;
-            display: inline-block;
-        }
-        .controls {
-            margin: 20px 0;
-        }
-        select, button {
-            margin: 5px;
-            padding: 5px;
-        }
-        #output {
-            margin-top: 20px;
-            font-size: 1.1em;
-        }
+        body { margin: 0; display: flex; flex-direction: column; align-items: center; }
+        canvas { border: 1px solid black; }
     </style>
 </head>
 <body>
-    <h1>Equivalent Resistance Simulation</h1>
-    <canvas id="circuitCanvas" width="600" height="400"></canvas>
-    <div class="controls">
-        <label for="circuit">Select Circuit: </label>
-        <select id="circuit" onchange="startSimulation()">
-            <option value="series">Simple Series (2Ω + 3Ω)</option>
-            <option value="parallel">Simple Parallel (2Ω || 2Ω)</option>
-            <option value="nested">Nested (2Ω || 2Ω) + (4Ω || 4Ω)</option>
-        </select><br>
-        <button onclick="startSimulation()">Start Simulation</button>
-        <button onclick="stepSimulation()">Next Step</button>
-    </div>
-    <div id="output"></div>
-
+    <h2>Equivalent Resistance Calculator</h2>
+    <p>Series: Add resistances, Parallel: 1 / (1/R1 + 1/R2 + ...)</p>
+    
     <script>
-        const canvas = document.getElementById('circuitCanvas');
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
-
-        // Graph representation: nodes and edges with resistance
-        class Graph {
-            constructor() {
-                this.nodes = new Set();
-                this.edges = []; // { u, v, resistance }
-            }
-
-            addEdge(u, v, resistance) {
-                this.nodes.add(u);
-                this.nodes.add(v);
-                this.edges.push({ u, v, resistance });
-            }
-
-            getNeighbors(node) {
-                return this.edges.filter(e => e.u === node || e.v === node);
-            }
-
-            degree(node) {
-                return this.getNeighbors(node).length;
+        let resistors = [2, 3]; // Example resistances
+        let config = 'series'; // 'series' or 'parallel'
+        
+        function calculateResistance() {
+            if (config === 'series') {
+                return resistors.reduce((sum, r) => sum + r, 0);
+            } else if (config === 'parallel') {
+                return 1 / resistors.reduce((sum, r) => sum + (1 / r), 0);
             }
         }
-
-        let graph = new Graph();
-        let step = 0;
-        let steps = [];
-        let startNode, endNode;
-
-        // Initialize test circuits
-        function initCircuit(circuitType) {
-            graph = new Graph();
-            steps = [];
-            step = 0;
-
-            switch (circuitType) {
-                case 'series':
-                    graph.addEdge(0, 1, 2); // 2Ω
-                    graph.addEdge(1, 2, 3); // 3Ω
-                    startNode = 0;
-                    endNode = 2;
-                    break;
-                case 'parallel':
-                    graph.addEdge(0, 1, 2); // 2Ω
-                    graph.addEdge(0, 1, 2); // 2Ω
-                    startNode = 0;
-                    endNode = 1;
-                    break;
-                case 'nested':
-                    graph.addEdge(0, 1, 2); // 2Ω
-                    graph.addEdge(0, 1, 2); // 2Ω
-                    graph.addEdge(1, 2, 4); // 4Ω
-                    graph.addEdge(1, 2, 4); // 4Ω
-                    startNode = 0;
-                    endNode = 2;
-                    break;
-            }
-            steps.push(JSON.stringify(graph)); // Initial state
+        
+        function setup() {
+            createCanvas(400, 200);
+            textSize(16);
         }
-
-        // Series reduction
-        function reduceSeries() {
-            for (let node of graph.nodes) {
-                if (node !== startNode && node !== endNode && graph.degree(node) === 2) {
-                    const neighbors = graph.getNeighbors(node);
-                    const [e1, e2] = neighbors;
-                    const u = e1.u === node ? e1.v : e1.u;
-                    const v = e2.u === node ? e2.v : e2.u;
-                    const newResistance = e1.resistance + e2.resistance;
-
-                    // Remove old edges and node
-                    graph.edges = graph.edges.filter(e => e !== e1 && e !== e2);
-                    graph.nodes.delete(node);
-                    graph.addEdge(u, v, newResistance);
-
-                    steps.push(`Series: Node ${node} removed, ${u}-${v} = ${newResistance}Ω`);
-                    return true;
-                }
-            }
-            return false;
+        
+        function draw() {
+            background(220);
+            text(`Configuration: ${config}`, 20, 30);
+            text(`Resistors: ${resistors.join(', ')} Ω`, 20, 60);
+            text(`Equivalent Resistance: ${calculateResistance().toFixed(2)} Ω`, 20, 90);
         }
-
-        // Parallel reduction
-        function reduceParallel() {
-            for (let i = 0; i < graph edges.length; i++) {
-                for (let j = i + 1; j < graph.edges.length; j++) {
-                    const e1 = graph.edges[i];
-                    const e2 = graph.edges[j];
-                    if ((e1.u === e2.u && e1.v === e2.v) || (e1.u === e2.v && e1.v === e2.u)) {
-                        const recipSum = 1 / e1.resistance + 1 / e2.resistance;
-                        const newResistance = (1 / recipSum).toFixed(2);
-
-                        // Remove parallel edges, add new edge
-                        graph.edges.splice(j, 1);
-                        graph.edges.splice(i, 1);
-                        graph.addEdge(e1.u, e1.v, parseFloat(newResistance));
-
-                        steps.push(`Parallel: ${e1.u}-${e1.v} (${e1.resistance}Ω || ${e2.resistance}Ω) = ${newResistance}Ω`);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        // Draw the graph
-        function drawGraph() {
-            ctx.clearRect(0, 0, width, height);
-            const nodePositions = {};
-            const nodeCount = graph.nodes.size;
-            const radius = 20;
-
-            // Assign positions
-            let i = 0;
-            for (let node of graph.nodes) {
-                nodePositions[node] = {
-                    x: width / 2 + 150 * Math.cos(2 * Math.PI * i / nodeCount),
-                    y: height / 2 + 150 * Math.sin(2 * Math.PI * i / nodeCount)
-                };
-                i++;
-            }
-
-            // Draw edges
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            for (let edge of graph.edges) {
-                const { u, v, resistance } = edge;
-                const uPos = nodePositions[u];
-                const vPos = nodePositions[v];
-                ctx.beginPath();
-                ctx.moveTo(uPos.x, uPos.y);
-                ctx.lineTo(vPos.x, vPos.y);
-                ctx.stroke();
-
-                // Label resistance
-                ctx.fillStyle = 'black';
-                ctx.font = '14px Arial';
-                const midX = (uPos.x + vPos.x) / 2;
-                const midY = (uPos.y + vPos.y) / 2;
-                ctx.fillText(`${resistance}Ω`, midX, midY);
-            }
-
-            // Draw nodes
-            ctx.fillStyle = 'lightblue';
-            for (let node of graph.nodes) {
-                const pos = nodePositions[node];
-                ctx.beginPath();
-                ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.stroke();
-
-                // Label node
-                ctx.fillStyle = 'black';
-                ctx.fillText(node, pos.x - 5, pos.y + 5);
-            }
-        }
-
-        // Step through simulation
-        function stepSimulation() {
-            if (graph.nodes.size > 2 || graph.edges.length > 1) {
-                if (reduceSeries() || reduceParallel()) {
-                    drawGraph();
-                    document.getElementById('output').innerText = steps[steps.length - 1];
-                }
-            } else if (graph.edges.length === 1) {
-                document.getElementById('output').innerText = 
-                    `Final Equivalent Resistance: ${graph.edges[0].resistance}Ω`;
-            }
-        }
-
-        // Start simulation
-        function startSimulation() {
-            const circuitType = document.getElementById('circuit').value;
-            initCircuit(circuitType);
-            drawGraph();
-            document.getElementById('output').innerText = 'Initial circuit loaded. Click "Next Step" to simplify.';
-        }
-
-        // Initial load
-        startSimulation();
     </script>
 </body>
 </html>
