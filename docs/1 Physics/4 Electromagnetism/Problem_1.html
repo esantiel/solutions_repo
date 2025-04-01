@@ -4,70 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lorentz Force Simulation</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
     </style>
 </head>
 <body>
     <script>
-        // Simulation parameters
-        const dt = 0.01;
-        const q = 1.0;
-        const m = 1.0;
-        const E = new THREE.Vector3(0, 0, 0);
-        const B = new THREE.Vector3(0, 0, 1);
-        let v = new THREE.Vector3(1, 0, 0);
-        let r = new THREE.Vector3(0, 0, 0);
-
-        // Runge-Kutta integration step
-        function lorentzForce(v, r) {
-            let vCrossB = new THREE.Vector3().crossVectors(v, B);
-            let force = new THREE.Vector3().addVectors(E, vCrossB).multiplyScalar(q / m);
-            return force;
+        let q = 1.0, m = 1.0;
+        let E = [0, 0];
+        let B = 1.0;
+        let v = [1, 0];
+        let r = [100, 100];
+        let dt = 0.1;
+        
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            background(0);
         }
-
-        function rk4Step(v, r) {
-            let k1v = lorentzForce(v, r).multiplyScalar(dt);
-            let k1r = v.clone().multiplyScalar(dt);
-
-            let k2v = lorentzForce(v.clone().add(k1v.clone().multiplyScalar(0.5)), r.clone().add(k1r.clone().multiplyScalar(0.5))).multiplyScalar(dt);
-            let k2r = v.clone().add(k1v.clone().multiplyScalar(0.5)).multiplyScalar(dt);
-
-            let k3v = lorentzForce(v.clone().add(k2v.clone().multiplyScalar(0.5)), r.clone().add(k2r.clone().multiplyScalar(0.5))).multiplyScalar(dt);
-            let k3r = v.clone().add(k2v.clone().multiplyScalar(0.5)).multiplyScalar(dt);
-
-            let k4v = lorentzForce(v.clone().add(k3v), r.clone().add(k3r)).multiplyScalar(dt);
-            let k4r = v.clone().add(k3v).multiplyScalar(dt);
-
-            v.add(k1v.add(k2v.multiplyScalar(2)).add(k3v.multiplyScalar(2)).add(k4v).multiplyScalar(1 / 6));
-            r.add(k1r.add(k2r.multiplyScalar(2)).add(k3r.multiplyScalar(2)).add(k4r).multiplyScalar(1 / 6));
+        
+        function lorentzForce(v) {
+            let vxB = [v[1] * B, -v[0] * B];
+            return [(q / m) * (E[0] + vxB[0]), (q / m) * (E[1] + vxB[1])];
         }
-
-        // Three.js scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Particle representation
-        const geometry = new THREE.SphereGeometry(0.1, 16, 16);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const particle = new THREE.Mesh(geometry, material);
-        scene.add(particle);
-
-        camera.position.z = 5;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            rk4Step(v, r);
-            particle.position.set(r.x, r.y, r.z);
-            renderer.render(scene, camera);
+        
+        function update() {
+            let a = lorentzForce(v);
+            v[0] += a[0] * dt;
+            v[1] += a[1] * dt;
+            r[0] += v[0] * dt;
+            r[1] += v[1] * dt;
         }
-
-        animate();
+        
+        function draw() {
+            update();
+            noStroke();
+            fill(255, 0, 0);
+            ellipse(r[0], r[1], 5, 5);
+        }
     </script>
 </body>
 </html>
