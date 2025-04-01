@@ -89,5 +89,3 @@ The square arrangement creates a symmetrical interference pattern, with maxima a
 - **Oceanography**: Wave interactions from multiple sources (e.g., ships).
 
 Limitations include assuming a 2D surface and no damping. Extending to 3D, varying phases, or adding attenuation could enrich the model.
-
-Let me know if you’d like an HTML version or further enhancements!
