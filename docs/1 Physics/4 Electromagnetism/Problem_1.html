@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <title>Lorentz Force Simulation</title>
     <style>
-        canvas { border: 1px solid black; }
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .controls { margin: 10px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+            display: inline-block;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        label, select, input, button {
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
@@ -14,16 +26,18 @@
     <canvas id="simulationCanvas" width="600" height="600"></canvas>
     <div class="controls">
         <label for="scenario">Scenario: </label>
-        <select id="scenario" onchange="resetSimulation()">
+        <select id="scenario" onchange="startSimulation()">
             <option value="uniformB">Uniform Magnetic Field</option>
             <option value="combinedEB">Combined E and B Fields</option>
             <option value="crossedEB">Crossed E and B Fields</option>
         </select><br>
-        <label for="bStrength">Magnetic Field Strength (T): </label>
-        <input type="range" id="bStrength" min="0.5" max="2" step="0.1" value="1" oninput="resetSimulation()"><br>
-        <label for="eStrength">Electric Field Strength (V/m): </label>
-        <input type="range" id="eStrength" min="0" max="200000" step="10000" value="100000" oninput="resetSimulation()"><br>
-        <button onclick="resetSimulation()">Reset Simulation</button>
+        <label for="bStrength">Magnetic Field (B, Tesla): </label>
+        <input type="range" id="bStrength" min="0.1" max="2" step="0.1" value="1" oninput="startSimulation()">
+        <span id="bValue">1</span><br>
+        <label for="eStrength">Electric Field (E, V/m): </label>
+        <input type="range" id="eStrength" min="0" max="200000" step="10000" value="100000" oninput="startSimulation()">
+        <span id="eValue">100000</span><br>
+        <button onclick="startSimulation()">Restart Simulation</button>
     </div>
 
     <script>
@@ -32,21 +46,25 @@
         const width = canvas.width;
         const height = canvas.height;
 
-        // Constants
+        // Physical constants
         const q = 1.6e-19;  // Charge (Coulombs, electron)
         const m = 9.11e-31; // Mass (kg, electron)
         const dt = 1e-9;    // Time step (seconds)
-        const scale = 1e9;  // Scale factor for visualization
+        const scale = 2e9;  // Scale factor for visualization (adjusted for visibility)
 
-        // Vector3D class
+        // Vector3D class for 3D operations
         class Vector3D {
             constructor(x, y, z) {
                 this.x = x;
                 this.y = y;
                 this.z = z;
             }
-            add(v) { return new Vector3D(this.x + v.x, this.y + v.y, this.z + v.z); }
-            scale(s) { return new Vector3D(this.x * s, this.y * s, this.z * s); }
+            add(v) {
+                return new Vector3D(this.x + v.x, this.y + v.y, this.z + v.z);
+            }
+            scale(s) {
+                return new Vector3D(this.x * s, this.y * s, this.z * s);
+            }
             cross(v) {
                 return new Vector3D(
                     this.y * v.z - this.z * v.y,
@@ -62,8 +80,8 @@
             return E.add(vCrossB).scale(q);
         }
 
-        // RK4 integration
-        function rk4Step(r, v, E, B, dt) {
+        // RK4 integration step
+        function rk4Step(r, v, E, B) {
             const k1_v = lorentzForce(v, E, B).scale(1 / m);
             const k1_r = v;
 
@@ -79,80 +97,108 @@
             const k4_v = lorentzForce(v4, E, B).scale(1 / m);
             const k4_r = v4;
 
-            const r_new = r.add(k1_r.add(k2_r.scale(2)).add(k3_r.scale(2)).add(k4_r).scale(dt / 6));
-            const v_new = v.add(k1_v.add(k2_v.scale(2)).add(k3_v.scale(2)).add(k4_v).scale(dt / 6));
+            const r_new = r.add(
+                k1_r.add(k2_r.scale(2)).add(k3_r.scale(2)).add(k4_r).scale(dt / 6)
+            );
+            const v_new = v.add(
+                k1_v.add(k2_v.scale(2)).add(k3_v.scale(2)).add(k4_v).scale(dt / 6)
+            );
 
             return { r: r_new, v: v_new };
         }
 
         // Simulation state
-        let r = new Vector3D(0, 0, 0);          // Initial position
-        let v = new Vector3D(1e5, 0, 0);        // Initial velocity (m/s)
+        let r = new Vector3D(0, 0, 0);         // Initial position
+        let v = new Vector3D(1e5, 0, 0);       // Initial velocity (m/s)
         let trajectory = [];
-        let step = 0;
-        const maxSteps = 1000;
+        let animationFrameId = null;
 
-        // Field configurations
+        // Get field values from controls
         function getFields() {
             const scenario = document.getElementById('scenario').value;
             const bStrength = parseFloat(document.getElementById('bStrength').value);
             const eStrength = parseFloat(document.getElementById('eStrength').value);
 
+            // Update displayed values
+            document.getElementById('bValue').textContent = bStrength;
+            document.getElementById('eValue').textContent = eStrength;
+
             let E, B;
             switch (scenario) {
                 case 'uniformB':
-                    E = new Vector3D(0, 0, 0);
-                    B = new Vector3D(0, 0, bStrength); // B along z
+                    E = new Vector3D(0, 0, 0);           // No electric field
+                    B = new Vector3D(0, 0, bStrength);   // B along z
                     break;
                 case 'combinedEB':
-                    E = new Vector3D(eStrength, 0, 0); // E along x
-                    B = new Vector3D(0, 0, bStrength); // B along z
+                    E = new Vector3D(eStrength, 0, 0);   // E along x
+                    B = new Vector3D(0, 0, bStrength);   // B along z
                     break;
                 case 'crossedEB':
-                    E = new Vector3D(0, eStrength, 0); // E along y
-                    B = new Vector3D(0, 0, bStrength); // B along z
+                    E = new Vector3D(0, eStrength, 0);   // E along y
+                    B = new Vector3D(0, 0, bStrength);   // B along z
                     break;
+                default:
+                    E = new Vector3D(0, 0, 0);
+                    B = new Vector3D(0, 0, 1);
             }
             return { E, B };
         }
 
-        // Reset simulation
-        function resetSimulation() {
+        // Start or restart simulation
+        function startSimulation() {
+            // Cancel any ongoing animation
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+
+            // Reset state
             r = new Vector3D(0, 0, 0);
-            v = new Vector3D(1e5, 0, 0);
+            v = new Vector3D(1e5, 0, 0); // 100,000 m/s along x
             trajectory = [];
-            step = 0;
             ctx.clearRect(0, 0, width, height);
+
+            // Start animation
             animate();
         }
 
         // Animation loop
         function animate() {
-            if (step < maxSteps) {
-                const { E, B } = getFields();
-                const { r: r_new, v: v_new } = rk4Step(r, v, E, B, dt);
-                r = r_new;
-                v = v_new;
-                trajectory.push(r);
+            const { E, B } = getFields();
+            const { r: r_new, v: v_new } = rk4Step(r, v, E, B);
+            r = r_new;
+            v = v_new;
+            trajectory.push(r);
 
-                // Draw trajectory (projected to xy-plane)
-                ctx.beginPath();
-                ctx.strokeStyle = 'blue';
-                for (let i = 0; i < trajectory.length; i++) {
-                    const x = width / 2 + trajectory[i].x * scale;
-                    const y = height / 2 - trajectory[i].y * scale; // Invert y for canvas
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
+            // Clear canvas and draw trajectory
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
 
-                step++;
-                requestAnimationFrame(animate);
+            for (let i = 0; i < trajectory.length; i++) {
+                const x = width / 2 + trajectory[i].x * scale;
+                const y = height / 2 - trajectory[i].y * scale; // Invert y for canvas
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw particle position
+            ctx.beginPath();
+            ctx.fillStyle = 'red';
+            ctx.arc(width / 2 + r.x * scale, height / 2 - r.y * scale, 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Stop if particle leaves canvas or after enough steps
+            if (trajectory.length < 1000 && 
+                Math.abs(r.x * scale) < width / 2 && 
+                Math.abs(r.y * scale) < height / 2) {
+                animationFrameId = requestAnimationFrame(animate);
             }
         }
 
-        // Start simulation
-        resetSimulation();
+        // Initial simulation start
+        startSimulation();
     </script>
 </body>
 </html>
