@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploring the Central Limit Theorem Through Simulations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exploring the Central Limit Theorem Through Simulations</h1>
+    <p>The Central Limit Theorem (CLT) is a fundamental concept in statistics, asserting that the distribution of sample means approximates a normal distribution as the sample size grows, regardless of the population's underlying distribution. This project uses simulations to demonstrate this phenomenon, offering a hands-on way to visualize and understand the theorem’s power.</p>
+
+    <div class="section">
+        <h2>1. Simulating Sampling Distributions</h2>
+        <p>We’ll simulate three distinct population distributions:</p>
+        <ul>
+            <li><strong>Uniform Distribution</strong>: A flat, evenly distributed range of values.</li>
+            <li><strong>Exponential Distribution</strong>: A skewed, right-tailed distribution common in time-to-event data.</li>
+            <li><strong>Binomial Distribution</strong>: A discrete distribution representing successes in a fixed number of trials.</li>
+        </ul>
+        <p>For each, we’ll generate a large population dataset (e.g., 100,000 values) to serve as the basis for sampling.</p>
+    </div>
+
+    <div class="section">
+        <h2>2. Sampling and Visualization</h2>
+        <p>For each population:</p>
+        <ul>
+            <li>Draw random samples of sizes 5, 10, 30, and 50.</li>
+            <li>Compute the sample mean for each draw.</li>
+            <li>Repeat this process 1,000 times to build a sampling distribution of the means.</li>
+            <li>Plot histograms of these sample means to observe their shape and convergence to normality.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Parameter Exploration</h2>
+        <p>We’ll examine:</p>
+        <ul>
+            <li>How the original distribution’s shape (e.g., skewness) affects convergence.</li>
+            <li>How sample size impacts the rate at which the sampling distribution becomes normal.</li>
+            <li>The role of population variance in determining the spread of the sampling distribution.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Practical Applications</h2>
+        <p>The CLT underpins many real-world statistical methods:</p>
+        <ul>
+            <li><strong>Estimating Population Parameters</strong>: Confidence intervals rely on the normality of sample means.</li>
+            <li><strong>Quality Control</strong>: Manufacturers use sample means to monitor product consistency.</li>
+            <li><strong>Financial Models</strong>: Stock returns are often modeled assuming normality of aggregated data.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Python Implementation</h2>
+        <p>Below is the Python script used to generate the simulations and plots:</p>
+        <pre>
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Parameters
+population_size = 100000
+sample_sizes = [5, 10, 30, 50]
+num_samples = 1000
+
+# Function to simulate and plot sampling distributions
+def simulate_clt(dist_name, population, sample_sizes, num_samples):
+    plt.figure(figsize=(12, 8))
+    for i, n in enumerate(sample_sizes, 1):
+        sample_means = [np.mean(np.random.choice(population, n)) for _ in range(num_samples)]
+        plt.subplot(2, 2, i)
+        sns.histplot(sample_means, bins=30, kde=True, stat="density")
+        plt.title(f"{dist_name}, n = {n}")
+        plt.xlabel("Sample Mean")
+        plt.ylabel("Density")
+    plt.tight_layout()
+    plt.show()
+
+# 1. Uniform Distribution
+uniform_pop = np.random.uniform(0, 10, population_size)
+simulate_clt("Uniform Distribution", uniform_pop, sample_sizes, num_samples)
+
+# 2. Exponential Distribution
+exp_pop = np.random.exponential(scale=2, size=population_size)
+simulate_clt("Exponential Distribution", exp_pop, sample_sizes, num_samples)
+
+# 3. Binomial Distribution
+binom_pop = np.random.binomial(n=10, p=0.5, size=population_size)
+simulate_clt("Binomial Distribution", binom_pop, sample_sizes, num_samples)
+        </pre>
+        <p><strong>Note:</strong> To embed the plots, run the Python code and save the figures (e.g., as <code>uniform.png</code>, <code>exponential.png</code>, <code>binomial.png</code>), then update the image tags below.</p>
+    </div>
+
+    <div class="section">
+        <h2>Results and Observations</h2>
+        <h3>Plots</h3>
+        <p><strong>Uniform Distribution</strong></p>
+        <img src="uniform.png" alt="Uniform Distribution Sampling Means">
+        <p><strong>Exponential Distribution</strong></p>
+        <img src="exponential.png" alt="Exponential Distribution Sampling Means">
+        <p><strong>Binomial Distribution</strong></p>
+        <img src="binomial.png" alt="Binomial Distribution Sampling Means">
+
+        <h3>Parameter Exploration</h3>
+        <ul>
+            <li><strong>Shape Influence</strong>: The exponential distribution, being highly skewed, requires a larger sample size (closer to 30) for normality to emerge compared to the symmetric uniform distribution.</li>
+            <li><strong>Sample Size</strong>: Across all distributions, larger sample sizes accelerate convergence to a normal shape.</li>
+            <li><strong>Variance Impact</strong>: The population variance affects the spread of the sampling distribution, with theoretical variance σ²/n.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Discussion and Implications</h2>
+        <p>The simulations illustrate the CLT: regardless of the population’s original shape, the sampling distribution of the mean becomes normal as sample size increases. This justifies its use in estimation, quality control, and financial modeling. The variance exploration highlights the importance of sample size for precision.</p>
+        <p>This exercise bridges theory and practice, deepening our appreciation for the CLT’s robustness.</p>
+    </div>
+</body>
+</html>

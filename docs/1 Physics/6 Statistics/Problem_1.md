@@ -39,61 +39,6 @@ The CLT underpins many real-world statistical methods:
 - **Financial Models**: Stock returns are often modeled assuming normality of aggregated data.
 
 ---
-
-### Python Implementation
-
-Below is a Python script using NumPy for random number generation and Matplotlib/Seaborn for visualization. This code simulates the process and generates the required plots.
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Set random seed for reproducibility
-np.random.seed(42)
-
-# Parameters
-population_size = 100000
-sample_sizes = [5, 10, 30, 50]
-num_samples = 1000
-
-# Function to simulate and plot sampling distributions
-def simulate_clt(dist_name, population, sample_sizes, num_samples):
-    plt.figure(figsize=(12, 8))
-    for i, n in enumerate(sample_sizes, 1):
-        # Draw samples and compute means
-        sample_means = [np.mean(np.random.choice(population, n)) for _ in range(num_samples)]
-        
-        # Plot histogram with KDE
-        plt.subplot(2, 2, i)
-        sns.histplot(sample_means, bins=30, kde=True, stat="density")
-        plt.title(f"{dist_name}, n = {n}")
-        plt.xlabel("Sample Mean")
-        plt.ylabel("Density")
-    plt.tight_layout()
-    plt.show()
-
-# 1. Uniform Distribution
-uniform_pop = np.random.uniform(0, 10, population_size)
-simulate_clt("Uniform Distribution", uniform_pop, sample_sizes, num_samples)
-
-# 2. Exponential Distribution
-exp_pop = np.random.exponential(scale=2, size=population_size)
-simulate_clt("Exponential Distribution", exp_pop, sample_sizes, num_samples)
-
-# 3. Binomial Distribution
-binom_pop = np.random.binomial(n=10, p=0.5, size=population_size)
-simulate_clt("Binomial Distribution", binom_pop, sample_sizes, num_samples)
-
-# Calculate population variances for discussion
-print("Population Variances:")
-print(f"Uniform: {np.var(uniform_pop):.2f}")
-print(f"Exponential: {np.var(exp_pop):.2f}")
-print(f"Binomial: {np.var(binom_pop):.2f}")
-```
-
----
-
 ### Results and Observations
 
 #### Plots
@@ -124,3 +69,5 @@ The variance exploration highlights a key nuance: while the shape converges to n
 ---
 
 This exercise deepens our appreciation for the CLT’s robustness and universality, bridging theory and practice through computational exploration. Feel free to tweak the code—adjust population parameters or sample sizes—to further probe its behavior!
+
+[Simulation](Problem_1.html)
