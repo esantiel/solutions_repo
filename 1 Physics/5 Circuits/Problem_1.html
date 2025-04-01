@@ -2,163 +2,229 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driven Damped Pendulum Simulation</title>
+    <title>Equivalent Resistance Simulation</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f0f0;
+            margin: 20px;
+            text-align: center;
         }
         canvas {
             border: 1px solid black;
-            background-color: white;
+            display: inline-block;
         }
         .controls {
-            margin: 20px;
-            padding: 10px;
-            background-color: #e0e0e0;
-            border-radius: 5px;
+            margin: 20px 0;
         }
-        label {
-            margin-right: 10px;
+        select, button {
+            margin: 5px;
+            padding: 5px;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
-    <h1>Driven Damped Pendulum Simulation</h1>
+    <h1>Equivalent Resistance Simulation</h1>
+    <canvas id="circuitCanvas" width="600" height="400"></canvas>
     <div class="controls">
-        <label for="gamma">Damping (\$gamma$):</label>
-        <input type="range" id="gamma" min="0" max="1" step="0.01" value="0.1">
-        <span id="gamma-value">0.1</span><br>
-
-        <label for="f">Forcing Amplitude ($f$):</label>
-        <input type="range" id="f" min="0" max="2" step="0.01" value="0.5">
-        <span id="f-value">0.5</span><br>
-
-        <label for="omega">Driving Frequency (\$omega$):</label>
-        <input type="range" id="omega" min="0" max="5" step="0.01" value="3.13">
-        <span id="omega-value">3.13</span><br>
-
-        <label for="nonlinear">Nonlinear (\$sin\theta$):</label>
-        <input type="checkbox" id="nonlinear" checked>
+        <label for="circuit">Select Circuit: </label>
+        <select id="circuit" onchange="startSimulation()">
+            <option value="series">Simple Series (2Ω + 3Ω)</option>
+            <option value="parallel">Simple Parallel (2Ω || 2Ω)</option>
+            <option value="nested">Nested (2Ω || 2Ω) + (4Ω || 4Ω)</option>
+        </select><br>
+        <button onclick="startSimulation()">Start Simulation</button>
+        <button onclick="stepSimulation()">Next Step</button>
     </div>
-    <canvas id="pendulumCanvas" width="600" height="400"></canvas>
+    <div id="output"></div>
 
     <script>
-        // Canvas setup
-        const canvas = document.getElementById('pendulumCanvas');
+        const canvas = document.getElementById('circuitCanvas');
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
 
-        // Pendulum parameters
-        const g = 9.8;  // gravity (m/s^2)
-        const L = 1.0;  // length (m)
-        const omega0 = Math.sqrt(g / L);  // natural frequency
-        let gamma = 0.1;  // damping
-        let f = 0.5;      // forcing amplitude
-        let omega = omega0;  // driving frequency (set to resonance initially)
-        let useNonlinear = true;  // toggle nonlinear vs linear
+        // Graph representation: nodes and edges with resistance
+        class Graph {
+            constructor() {
+                this.nodes = new Set();
+                this.edges = []; // { u, v, resistance }
+            }
 
-        // Initial conditions
-        let theta = 0.1;  // initial angle (rad)
-        let v = 0;        // initial angular velocity (rad/s)
-        let t = 0;        // time
-        const dt = 0.02;  // time step
+            addEdge(u, v, resistance) {
+                this.nodes.add(u);
+                this.nodes.add(v);
+                this.edges.push({ u, v, resistance });
+            }
 
-        // Canvas scaling
-        const pivotX = width / 2;
-        const pivotY = height / 4;
-        const scale = 150;  // pixels per meter
+            getNeighbors(node) {
+                return this.edges.filter(e => e.u === node || e.v === node);
+            }
 
-        // Control elements
-        const gammaSlider = document.getElementById('gamma');
-        const gammaValue = document.getElementById('gamma-value');
-        const fSlider = document.getElementById('f');
-        const fValue = document.getElementById('f-value');
-        const omegaSlider = document.getElementById('omega');
-        const omegaValue = document.getElementById('omega-value');
-        const nonlinearCheckbox = document.getElementById('nonlinear');
-
-        // Update parameters from sliders
-        gammaSlider.addEventListener('input', () => {
-            gamma = parseFloat(gammaSlider.value);
-            gammaValue.textContent = gamma.toFixed(2);
-        });
-
-        fSlider.addEventListener('input', () => {
-            f = parseFloat(fSlider.value);
-            fValue.textContent = f.toFixed(2);
-        });
-
-        omegaSlider.addEventListener('input', () => {
-            omega = parseFloat(omegaSlider.value);
-            omegaValue.textContent = omega.toFixed(2);
-        });
-
-        nonlinearCheckbox.addEventListener('change', () => {
-            useNonlinear = nonlinearCheckbox.checked;
-        });
-
-        // Physics simulation
-        function updatePendulum() {
-            // Acceleration: d^2theta/dt^2 = -omega0^2 * sin(theta) - gamma * v + f * cos(omega * t)
-            const angle = useNonlinear ? Math.sin(theta) : theta;  // Nonlinear vs linear
-            const accel = -omega0 * omega0 * angle - gamma * v + f * Math.cos(omega * t);
-
-            // Update velocity and angle using Euler method
-            v += accel * dt;
-            theta += v * dt;
-            t += dt;
+            degree(node) {
+                return this.getNeighbors(node).length;
+            }
         }
 
-        // Drawing the pendulum
-        function drawPendulum() {
+        let graph = new Graph();
+        let step = 0;
+        let steps = [];
+        let startNode, endNode;
+
+        // Initialize test circuits
+        function initCircuit(circuitType) {
+            graph = new Graph();
+            steps = [];
+            step = 0;
+
+            switch (circuitType) {
+                case 'series':
+                    graph.addEdge(0, 1, 2); // 2Ω
+                    graph.addEdge(1, 2, 3); // 3Ω
+                    startNode = 0;
+                    endNode = 2;
+                    break;
+                case 'parallel':
+                    graph.addEdge(0, 1, 2); // 2Ω
+                    graph.addEdge(0, 1, 2); // 2Ω
+                    startNode = 0;
+                    endNode = 1;
+                    break;
+                case 'nested':
+                    graph.addEdge(0, 1, 2); // 2Ω
+                    graph.addEdge(0, 1, 2); // 2Ω
+                    graph.addEdge(1, 2, 4); // 4Ω
+                    graph.addEdge(1, 2, 4); // 4Ω
+                    startNode = 0;
+                    endNode = 2;
+                    break;
+            }
+            steps.push(JSON.stringify(graph)); // Initial state
+        }
+
+        // Series reduction
+        function reduceSeries() {
+            for (let node of graph.nodes) {
+                if (node !== startNode && node !== endNode && graph.degree(node) === 2) {
+                    const neighbors = graph.getNeighbors(node);
+                    const [e1, e2] = neighbors;
+                    const u = e1.u === node ? e1.v : e1.u;
+                    const v = e2.u === node ? e2.v : e2.u;
+                    const newResistance = e1.resistance + e2.resistance;
+
+                    // Remove old edges and node
+                    graph.edges = graph.edges.filter(e => e !== e1 && e !== e2);
+                    graph.nodes.delete(node);
+                    graph.addEdge(u, v, newResistance);
+
+                    steps.push(`Series: Node ${node} removed, ${u}-${v} = ${newResistance}Ω`);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Parallel reduction
+        function reduceParallel() {
+            for (let i = 0; i < graph edges.length; i++) {
+                for (let j = i + 1; j < graph.edges.length; j++) {
+                    const e1 = graph.edges[i];
+                    const e2 = graph.edges[j];
+                    if ((e1.u === e2.u && e1.v === e2.v) || (e1.u === e2.v && e1.v === e2.u)) {
+                        const recipSum = 1 / e1.resistance + 1 / e2.resistance;
+                        const newResistance = (1 / recipSum).toFixed(2);
+
+                        // Remove parallel edges, add new edge
+                        graph.edges.splice(j, 1);
+                        graph.edges.splice(i, 1);
+                        graph.addEdge(e1.u, e1.v, parseFloat(newResistance));
+
+                        steps.push(`Parallel: ${e1.u}-${e1.v} (${e1.resistance}Ω || ${e2.resistance}Ω) = ${newResistance}Ω`);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Draw the graph
+        function drawGraph() {
             ctx.clearRect(0, 0, width, height);
+            const nodePositions = {};
+            const nodeCount = graph.nodes.size;
+            const radius = 20;
 
-            // Calculate bob position
-            const bobX = pivotX + scale * L * Math.sin(theta);
-            const bobY = pivotY + scale * L * Math.cos(theta);
+            // Assign positions
+            let i = 0;
+            for (let node of graph.nodes) {
+                nodePositions[node] = {
+                    x: width / 2 + 150 * Math.cos(2 * Math.PI * i / nodeCount),
+                    y: height / 2 + 150 * Math.sin(2 * Math.PI * i / nodeCount)
+                };
+                i++;
+            }
 
-            // Draw pivot
-            ctx.beginPath();
-            ctx.arc(pivotX, pivotY, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = 'black';
-            ctx.fill();
-
-            // Draw rod
-            ctx.beginPath();
-            ctx.moveTo(pivotX, pivotY);
-            ctx.lineTo(bobX, bobY);
+            // Draw edges
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 2;
-            ctx.stroke();
+            for (let edge of graph.edges) {
+                const { u, v, resistance } = edge;
+                const uPos = nodePositions[u];
+                const vPos = nodePositions[v];
+                ctx.beginPath();
+                ctx.moveTo(uPos.x, uPos.y);
+                ctx.lineTo(vPos.x, vPos.y);
+                ctx.stroke();
 
-            // Draw bob
-            ctx.beginPath();
-            ctx.arc(bobX, bobY, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = 'blue';
-            ctx.fill();
+                // Label resistance
+                ctx.fillStyle = 'black';
+                ctx.font = '14px Arial';
+                const midX = (uPos.x + vPos.x) / 2;
+                const midY = (uPos.y + vPos.y) / 2;
+                ctx.fillText(`${resistance}Ω`, midX, midY);
+            }
 
-            // Draw labels
-            ctx.font = '14px Arial';
-            ctx.fillStyle = 'black';
-            ctx.fillText(`θ = ${(theta * 180 / Math.PI).toFixed(1)}°`, 10, 20);
-            ctx.fillText(`v = ${v.toFixed(2)} rad/s`, 10, 40);
+            // Draw nodes
+            ctx.fillStyle = 'lightblue';
+            for (let node of graph.nodes) {
+                const pos = nodePositions[node];
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.stroke();
+
+                // Label node
+                ctx.fillStyle = 'black';
+                ctx.fillText(node, pos.x - 5, pos.y + 5);
+            }
         }
 
-        // Animation loop
-        function animate() {
-            updatePendulum();
-            drawPendulum();
-            requestAnimationFrame(animate);
+        // Step through simulation
+        function stepSimulation() {
+            if (graph.nodes.size > 2 || graph.edges.length > 1) {
+                if (reduceSeries() || reduceParallel()) {
+                    drawGraph();
+                    document.getElementById('output').innerText = steps[steps.length - 1];
+                }
+            } else if (graph.edges.length === 1) {
+                document.getElementById('output').innerText = 
+                    `Final Equivalent Resistance: ${graph.edges[0].resistance}Ω`;
+            }
         }
 
-        // Start the simulation
-        animate();
+        // Start simulation
+        function startSimulation() {
+            const circuitType = document.getElementById('circuit').value;
+            initCircuit(circuitType);
+            drawGraph();
+            document.getElementById('output').innerText = 'Initial circuit loaded. Click "Next Step" to simplify.';
+        }
+
+        // Initial load
+        startSimulation();
     </script>
 </body>
 </html>
