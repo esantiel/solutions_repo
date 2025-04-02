@@ -3,41 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circuit Resistance Simulation</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.js"></script>
-    <style>
-        body { margin: 0; display: flex; flex-direction: column; align-items: center; }
-        canvas { border: 1px solid black; }
-    </style>
-</head>
-<body>
-    <h2>Equivalent Resistance Calculator</h2>
-    <p>Series: Add resistances, Parallel: 1 / (1/R1 + 1/R2 + ...)</p>
-    
+    <title>Equivalent Resistance Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/networkx/3.0/networkx.min.js"></script>
     <script>
-        let resistors = [2, 3]; // Example resistances
-        let config = 'series'; // 'series' or 'parallel'
-        
         function calculateResistance() {
-            if (config === 'series') {
-                return resistors.reduce((sum, r) => sum + r, 0);
-            } else if (config === 'parallel') {
-                return 1 / resistors.reduce((sum, r) => sum + (1 / r), 0);
-            }
-        }
-        
-        function setup() {
-            createCanvas(400, 200);
-            textSize(16);
-        }
-        
-        function draw() {
-            background(220);
-            text(`Configuration: ${config}`, 20, 30);
-            text(`Resistors: ${resistors.join(', ')} Ω`, 20, 60);
-            text(`Equivalent Resistance: ${calculateResistance().toFixed(2)} Ω`, 20, 90);
+            let graph = {
+                "nodes": [0, 1, 2],
+                "edges": [
+                    { "from": 0, "to": 1, "resistance": 2 },
+                    { "from": 1, "to": 2, "resistance": 3 }
+                ]
+            };
+
+            let resistance = 0;
+            graph.edges.forEach(edge => {
+                resistance += edge.resistance;
+            });
+
+            document.getElementById("result").innerText = "Equivalent Resistance: " + resistance + " Ω";
         }
     </script>
+</head>
+<body>
+    <h1>Equivalent Resistance Calculator</h1>
+    <button onclick="calculateResistance()">Calculate</button>
+    <p id="result"></p>
 </body>
 </html>
