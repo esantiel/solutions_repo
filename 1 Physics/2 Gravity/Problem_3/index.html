@@ -60,6 +60,20 @@
 </li>
 <li class="toctree-l2 current"><a class="reference internal current" href="#">Problem 3</a>
 <ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="#trajectories-of-a-freely-released-payload-near-earth">Trajectories of a Freely Released Payload Near Earth</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation">Simulation</a>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#1-analysis-of-possible-trajectories">1. Analysis of Possible Trajectories</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#2-numerical-analysis">2. Numerical Analysis</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#3-relation-to-space-scenarios">3. Relation to Space Scenarios</a>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#4-computational-tool">4. Computational Tool</a>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -172,13 +186,10 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <h1 id="problem-3">Problem 3</h1>
-<p>Let’s explore the trajectories of a freely released payload near Earth—a captivating problem that ties together gravitational physics, orbital mechanics, and numerical simulation. Below is a comprehensive response in Markdown format, including a Python script for simulation and visualization, fulfilling all deliverables.</p>
-<hr/>
-<h1 id="trajectories-of-a-freely-released-payload-near-earth">Trajectories of a Freely Released Payload Near Earth</h1>
-<h2 id="motivation">Motivation</h2>
+<h2 id="trajectories-of-a-freely-released-payload-near-earth">Trajectories of a Freely Released Payload Near Earth</h2>
 <p>When a payload is released from a rocket near Earth, its subsequent path is shaped by its initial position, velocity, and Earth’s gravitational pull. Depending on these conditions, the trajectory could be elliptical (orbiting), parabolic (just escaping), or hyperbolic (escaping with excess speed). This scenario is fundamental to space mission design, such as deploying satellites, planning reentries, or achieving escape velocities, offering a practical lens into celestial mechanics.</p>
-<p><a href="../Problem_3.html">Simulation</a></p>
-<h2 id="task-breakdown">Task Breakdown</h2>
+<hr/>
+<h2 id="simulation"><a href="../Problem_3.html">Simulation</a></h2>
 <h3 id="1-analysis-of-possible-trajectories">1. Analysis of Possible Trajectories</h3>
 <p>The trajectory type depends on the payload’s specific energy relative to Earth’s gravitational potential:
 - <strong>Total Mechanical Energy</strong>: <span class="arithmatex">\(E = \frac{1}{2} v^2 - \frac{G M}{r}\)</span></p>
@@ -233,28 +244,6 @@
 <p><strong>Hyperbolic</strong>: <span class="arithmatex">\(v = 1.2 v_{\text{esc}} \approx 13.2 \, \text{km/s}\)</span>, <span class="arithmatex">\(E &gt; 0\)</span></p>
 </li>
 </ul>
-<hr/>
-<h2 id="deliverables">Deliverables</h2>
-<h3 id="explanation">Explanation</h3>
-<ul>
-<li><strong>Trajectories</strong>: Determined by energy: elliptical (bound), parabolic (marginal escape), hyperbolic (unbound).</li>
-<li><strong>Numerical Method</strong>: RK4 integrates the two-body problem, tracking position and velocity.</li>
-<li><strong>Scenarios</strong>: Orbital insertion (elliptical), reentry (if aimed downward), escape (parabolic/hyperbolic).</li>
-</ul>
-<h3 id="graphical-representation">Graphical Representation</h3>
-<ul>
-<li>Plot shows Earth with three trajectories from 200 km altitude:</li>
-<li>Blue: Elliptical orbit.</li>
-<li>Green: Parabolic escape.</li>
-<li>Red: Hyperbolic escape.</li>
-</ul>
-<hr/>
-<h2 id="discussion">Discussion</h2>
-<p>The simulation captures key dynamics:
-- <strong>Orbital Insertion</strong>: Tangential <span class="arithmatex">\(v &lt; v_{\text{esc}}\)</span> yields stable orbits (e.g., satellites).
-- <strong>Reentry</strong>: Downward velocity at low altitude (not simulated here) leads to atmospheric capture.
-- <strong>Escape</strong>: <span class="arithmatex">\(v \geq v_{\text{esc}}\)</span> sends payloads beyond Earth’s influence, critical for lunar or interplanetary missions.</p>
-<p>Limitations include ignoring atmospheric drag, Earth’s oblateness, and other bodies. Adding these or varying initial directions could enhance realism.</p>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
