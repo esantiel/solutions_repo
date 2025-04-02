@@ -4,29 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equivalent Resistance Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/networkx/3.0/networkx.min.js"></script>
     <script>
-        function calculateResistance() {
-            let graph = {
-                "nodes": [0, 1, 2],
-                "edges": [
-                    { "from": 0, "to": 1, "resistance": 2 },
-                    { "from": 1, "to": 2, "resistance": 3 }
-                ]
-            };
+        class Circuit {
+            constructor() {
+                this.graph = {};
+            }
 
-            let resistance = 0;
-            graph.edges.forEach(edge => {
-                resistance += edge.resistance;
-            });
+            addResistor(node1, node2, resistance) {
+                if (!this.graph[node1]) this.graph[node1] = [];
+                if (!this.graph[node2]) this.graph[node2] = [];
+                this.graph[node1].push({ node: node2, resistance: resistance });
+                this.graph[node2].push({ node: node1, resistance: resistance });
+            }
 
-            document.getElementById("result").innerText = "Equivalent Resistance: " + resistance + " Ω";
+            seriesResistance(node1, node2) {
+                let totalResistance = 0;
+                let visited = new Set();
+                
+                function dfs(node, resistance) {
+                    if (node === node2) {
+                        totalResistance = resistance;
+                        return;
+                    }
+                    visited.add(node);
+                    for (let edge of this.graph[node] || []) {
+                        if (!visited.has(edge.node)) {
+                            dfs.call(this, edge.node, resistance + edge.resistance);
+                        }
+                    }
+                }
+                
+                dfs.call(this, node1, 0);
+                return totalResistance;
+            }
+        }
+
+        function simulate() {
+            let circuit = new Circuit();
+            circuit.addResistor(0, 1, 2);
+            circuit.addResistor(1, 2, 3);
+            
+            let result = circuit.seriesResistance(0, 2);
+            document.getElementById("result").innerText = "Equivalent Resistance: " + result + " Ω";
         }
     </script>
 </head>
 <body>
-    <h1>Equivalent Resistance Calculator</h1>
-    <button onclick="calculateResistance()">Calculate</button>
+    <h1>Equivalent Resistance Simulator</h1>
+    <button onclick="simulate()">Simulate</button>
     <p id="result"></p>
 </body>
 </html>
+
