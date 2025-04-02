@@ -1,15 +1,12 @@
 # Problem 1
-Below is a Markdown document with an embedded Python script that implements the requested simulation of the Lorentz force acting on a charged particle. The simulation includes the specified field configurations, parameter exploration, and visualizations, followed by a discussion tying the results to practical systems.
-
 ---
 
-# Simulating the Effects of the Lorentz Force
+## Simulating the Effects of the Lorentz Force
 
-## Motivation
 The Lorentz force, defined as $\mathbf{F} = q(\mathbf{E} + \mathbf{v} \times \mathbf{B})$, describes the force on a charged particle in the presence of electric ($\mathbf{E}$) and magnetic ($\mathbf{B}$) fields. This fundamental principle underpins phenomena in plasma physics, particle accelerators, and astrophysics. Simulating its effects allows us to visualize complex particle trajectories and explore its applications in real-world systems.
 
+---
 [Simulation](Problem_1.html)
-
 ---
 
 ## 1. Exploration of Applications

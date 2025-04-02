@@ -61,17 +61,3 @@ The CLT is a statistical superhero! Here’s why it matters:
 2. **Quality Control**: In manufacturing, sample averages of product measurements (e.g., widget lengths) are monitored. The CLT ensures these averages are normally distributed, making defect detection reliable.
 3. **Financial Models**: Stock returns or risk assessments often rely on averages over time. The CLT justifies using normal-based models even if daily returns aren’t normal.
 
----
-
-### Discussion
-
-These simulations confirm the CLT’s promise: as sample size increases, sample means form a normal distribution, regardless of the population’s quirks. The rate of convergence depends on the population’s shape—skewed distributions need larger samples—but the destination is the same. The tighter spread with larger n (due to the standard error) also matches theory perfectly.
-
-This hands-on approach makes the CLT less abstract. It’s not just a theorem—it’s a tool that underpins much of modern statistics!
-
----
-
-### Deliverables
-- **Markdown**: This response can be saved as a `.md` file.
-- **Python Script**: The code above is ready to run in a notebook. Add comments or tweak parameters (e.g., population size) as needed.
-- **Plots**: Generated automatically by the script.

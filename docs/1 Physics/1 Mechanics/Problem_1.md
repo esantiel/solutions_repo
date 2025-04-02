@@ -1,7 +1,4 @@
 # Problem 1
-Let’s dive into this investigation of how the range of a projectile depends on the angle of projection. We’ll proceed step-by-step through the theoretical foundation, range analysis, practical applications, and computational implementation, keeping the physics clear and engaging.
-
----
 
 ### 1. Theoretical Foundation
 
@@ -33,11 +30,10 @@ Using kinematics (or integrating the accelerations), the velocity and position a
 
 These are parametric equations describing a parabolic trajectory. The family of solutions emerges from varying $v_0$, $\theta$, and $g$. For instance, a higher $v_0$ stretches the parabola, while a larger $g$ compresses it vertically.
 
+
 ---
-
-
 [Simulation](Problem_1.html)
-
+---
 
 
 ### 2. Analysis of the Range
@@ -94,42 +90,7 @@ This model simplifies real-world scenarios but can be adapted:
   - **Sports**: A soccer ball’s range depends on kick angle and speed, modified by spin and air effects.
   - **Artillery**: Cannons adjust angles for range, accounting for wind and elevation.
   - **Space**: Rockets use initial angles, but thrust and gravity variations dominate.
-
 ---
-
-
-
-### 4. Implementation
-
-Let’s simulate this computationally and visualize the range. Here’s a Python snippet using NumPy and Matplotlib:
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Parameters
-v0 = 20.0  # initial velocity (m/s)
-g = 9.8    # gravity (m/s^2)
-theta_deg = np.linspace(0, 90, 91)  # angles from 0° to 90°
-theta_rad = np.radians(theta_deg)
-
-# Range function
-R = (v0**2 * np.sin(2 * theta_rad)) / g
-
-# Plot
-plt.plot(theta_deg, R, label=f'v₀ = {v0} m/s, g = {g} m/s²')
-plt.xlabel('Angle of Projection (degrees)')
-plt.ylabel('Range (meters)')
-plt.title('Range vs. Angle of Projection')
-plt.grid(True)
-plt.legend()
-plt.show()
-
-# Optimal angle
-max_idx = np.argmax(R)
-print(f"Maximum range {R[max_idx]:.2f} m at {theta_deg[max_idx]}°")
-```
-
 #### Visualization Insights
 - For $v_0 = 20 \, \text{m/s}$, $g = 9.8 \, \text{m/s}^2$, the plot shows a peak at 45°, with $R_{\text{max}} \approx 40.8 \, \text{m}$.
 
@@ -144,7 +105,3 @@ print(f"Maximum range {R[max_idx]:.2f} m at {theta_deg[max_idx]}°")
 ### Conclusion
 The range’s dependence on $\theta$ via $\sin 2\theta$ is both elegant and practical, peaking at 45° under ideal conditions. Variations in $v_0$ and $g$ amplify or shrink this relationship, while real-world factors like height or drag enrich the problem. This blend of theory, analysis, and simulation makes projectile motion a timeless physics gem.
 
-Let me know if you’d like to tweak parameters, generate a specific plot, or dive deeper into any part!
-
-[def]: project_motion.html
-[def2]: project_motion.html

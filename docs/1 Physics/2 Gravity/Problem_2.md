@@ -1,15 +1,13 @@
 # Problem 2
-Let’s dive into the fascinating world of escape velocities and cosmic velocities, key concepts that unlock the mechanics of space travel. Below is a comprehensive response in Markdown format, including a Python script for simulation and visualization, fulfilling all deliverables.
 
----
 
 # Escape Velocities and Cosmic Velocities
 
-## Motivation
+
 Escape velocity is the minimum speed an object must achieve to break free from a celestial body’s gravitational pull without further propulsion. Building on this, cosmic velocities—first, second, and third—define critical thresholds for orbiting a planet, escaping its gravity, and exiting a star system, respectively. These ideas are the backbone of space exploration, guiding everything from satellite launches to interplanetary missions and dreams of interstellar voyages.
 
 
-
+![alt text](41467_2022_32299_Fig4_HTML.png)
 
 ## Task Breakdown
 
@@ -89,32 +87,5 @@ where $v_{\text{esc,Sun}} = \sqrt{\frac{2 G M_{\text{Sun}}}{d}}$ is the escape v
 
 - **Jupiter**: $v_1 \approx 42.14 \, \text{km/s}$, $v_2 \approx 59.54 \, \text{km/s}$, $v_3 \approx 60.17 \, \text{km/s}$
 
-### 4. Importance in Space Exploration
 
-- **Satellites**: $v_1$ sets the speed for low Earth orbit (e.g., 7.8 km/s at 200 km altitude).
-- **Planetary Missions**: $v_2$ is needed to leave Earth (11.2 km/s), often boosted by rockets in stages.
-- **Interstellar Travel**: $v_3$ (e.g., 12.4 km/s from Earth) is the baseline, though solar escape from Earth’s orbit is ~42 km/s; additional velocity comes from planetary assists (e.g., Voyager).
 
----
-
-## Deliverables
-
-### Explanation
-- **Definitions**: $v_1$ for orbit, $v_2$ for escape, $v_3$ for system escape.
-- **Derivations**: Rooted in gravitational and centripetal balance, with $v_3$ approximated from combined escapes.
-- **Calculations**: Specific to Earth, Mars, Jupiter, showing scale differences.
-
-### Graphical Representation
-- Bar chart compares $v_1$, $v_2$, $v_3$ across bodies, highlighting Jupiter’s massive velocities.
-
-![alt text](41467_2022_32299_Fig4_HTML.png)
-
----
-
-## Discussion
-These velocities dictate space mission design:
-- **Earth**: $v_2 = 11.19 \, \text{km/s}$ is achievable with modern rockets (e.g., Falcon 9).
-- **Mars**: Lower $v_2$ eases launches from its surface.
-- **Jupiter**: High velocities pose challenges for orbit or escape.
-
-Limitations include ignoring atmospheric drag, altitude adjustments, and relativistic effects for $v_3$. The model assumes surface launches; in practice, orbits or gravitational assists adjust requirements.

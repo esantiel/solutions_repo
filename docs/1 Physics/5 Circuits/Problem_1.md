@@ -95,13 +95,4 @@ The algorithm iteratively simplifies the graph by identifying and reducing serie
    - Use a priority queue to identify reducible patterns more efficiently.
    - Implement cycle detection to handle complex graphs with non-series-parallel structures.
 
----
 
-### Deliverables Summary
-- **Implementation**: Provided in Python using `networkx`.
-- **Test Cases**: Three examples (series, parallel, nested) with expected and calculated results.
-- **Analysis**: Discussed efficiency and suggested improvements like delta-star transformations.
-
-This solution demonstrates how graph theory simplifies equivalent resistance calculations, with potential for extension to more complex circuits. Let me know if you’d like to explore additional test cases or improvements!
-
-[Simulation](Problem_1.html)

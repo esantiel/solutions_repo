@@ -4,7 +4,7 @@
 
 
 [Simulation](Problem_2.html)
-
+---
 
 ## Task Breakdown
 
@@ -83,28 +83,4 @@ Beyond small angles, $\sin\theta$ introduces nonlinearity, leading to complex be
 - **Suspension Bridges**: Wind acts as a periodic force; damping prevents destructive resonance (e.g., Tacoma Narrows).
 - **Circuits**: Driven RLC circuits mimic this behavior, with voltage as the forcing term.
 
----
 
-
-## Deliverables
-
-### General Solutions
-- **Small Angles**: Linear solution shows transient decay plus steady-state oscillation, peaking at resonance.
-- **Nonlinear**: Numerical solutions reveal periodic, quasiperiodic, or chaotic motion depending on parameters.
-
-### Graphical Representations
-- **Time Series**: Shows resonance (large amplitude at $\omega = \omega_0$), moderate forcing (steady oscillation), and chaos (irregular motion).
-- **Phase Portrait**: Resonance traces a spiral or ellipse; chaos fills a region unpredictably.
-- **Poincaré Section**: Periodic motion yields few points; chaos shows a scattered pattern.
-- **Bifurcation Diagram**: As $f$ increases, motion transitions from periodic to chaotic, with period-doubling visible.
-
-### Limitations and Extensions
-- **Limitations**: Assumes constant $g$, no air resistance beyond linear damping, and periodic forcing.
-- **Extensions**: Add nonlinear damping ($\gamma v^2$), non-periodic forcing, or couple multiple pendulums.
-
----
-
-## Discussion
-The forced damped pendulum bridges simple oscillators and chaotic systems. Resonance amplifies energy transfer, critical for engineering design, while chaos highlights sensitivity to conditions, relevant in climate modeling or cryptography. The visualizations—phase portraits, Poincaré sections, and bifurcation diagrams—offer intuitive insights into these transitions, making this a powerful educational and practical tool.
-
-Let me know if you’d like to adjust parameters, explore specific cases, or convert this to another format!

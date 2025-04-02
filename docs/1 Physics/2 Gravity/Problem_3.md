@@ -1,19 +1,13 @@
 # Problem 3
-Let’s explore the trajectories of a freely released payload near Earth—a captivating problem that ties together gravitational physics, orbital mechanics, and numerical simulation. Below is a comprehensive response in Markdown format, including a Python script for simulation and visualization, fulfilling all deliverables.
 
----
+## Trajectories of a Freely Released Payload Near Earth
 
-# Trajectories of a Freely Released Payload Near Earth
-
-## Motivation
 When a payload is released from a rocket near Earth, its subsequent path is shaped by its initial position, velocity, and Earth’s gravitational pull. Depending on these conditions, the trajectory could be elliptical (orbiting), parabolic (just escaping), or hyperbolic (escaping with excess speed). This scenario is fundamental to space mission design, such as deploying satellites, planning reentries, or achieving escape velocities, offering a practical lens into celestial mechanics.
 
 
-
+---
 [Simulation](Problem_3.html)
-
-
-## Task Breakdown
+---
 
 ### 1. Analysis of Possible Trajectories
 
@@ -62,27 +56,3 @@ where $\mathbf{r} = (x, y)$, $r = |\mathbf{r}|$. We’ll solve this numerically 
 
 - **Hyperbolic**: $v = 1.2 v_{\text{esc}} \approx 13.2 \, \text{km/s}$, $E > 0$
 
----
-
-## Deliverables
-
-### Explanation
-- **Trajectories**: Determined by energy: elliptical (bound), parabolic (marginal escape), hyperbolic (unbound).
-- **Numerical Method**: RK4 integrates the two-body problem, tracking position and velocity.
-- **Scenarios**: Orbital insertion (elliptical), reentry (if aimed downward), escape (parabolic/hyperbolic).
-
-### Graphical Representation
-- Plot shows Earth with three trajectories from 200 km altitude:
-  - Blue: Elliptical orbit.
-  - Green: Parabolic escape.
-  - Red: Hyperbolic escape.
-
----
-
-## Discussion
-The simulation captures key dynamics:
-- **Orbital Insertion**: Tangential $v < v_{\text{esc}}$ yields stable orbits (e.g., satellites).
-- **Reentry**: Downward velocity at low altitude (not simulated here) leads to atmospheric capture.
-- **Escape**: $v \geq v_{\text{esc}}$ sends payloads beyond Earth’s influence, critical for lunar or interplanetary missions.
-
-Limitations include ignoring atmospheric drag, Earth’s oblateness, and other bodies. Adding these or varying initial directions could enhance realism.
