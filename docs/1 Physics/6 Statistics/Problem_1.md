@@ -1,8 +1,4 @@
 # Problem 1
-Let’s dive into this exploration of the Central Limit Theorem (CLT) through simulations! I’ll guide you through creating a Python script that implements the tasks you’ve outlined, complete with explanations and code. We’ll simulate sampling distributions from different population types, visualize the results, and discuss the implications—all in a way that’s clear and engaging. Since you’ve requested a Markdown document and Python scripts, I’ll structure this response as a Markdown-style explanation with embedded code that you can copy into a Jupyter notebook or Python file.
-
----
-
 ### Exploring the Central Limit Theorem Through Simulations
 
 The Central Limit Theorem (CLT) tells us that, under certain conditions, the distribution of sample means will approximate a normal distribution as the sample size grows, regardless of the population’s original shape. This is a powerful idea, and simulations are a fantastic way to see it in action. Let’s break this down step-by-step.
@@ -31,55 +27,6 @@ We’ll observe how the population’s shape and variance affect convergence to 
 #### Step 4: Practical Applications
 
 Finally, we’ll reflect on why the CLT matters in the real world.
-
----
-
-### Python Implementation
-
-Here’s a Python script using NumPy, Matplotlib, and Seaborn to perform the simulations and create visualizations. You can run this in a Jupyter notebook for interactive plots.
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Set random seed for reproducibility
-np.random.seed(42)
-
-# Parameters
-population_size = 10000  # Size of the population dataset
-sample_sizes = [5, 10, 30, 50]  # Different sample sizes to test
-num_samples = 1000  # Number of samples to draw for each size
-
-# Function to simulate and plot sampling distributions
-def simulate_clt(dist_name, population, sample_sizes, num_samples):
-    plt.figure(figsize=(12, 8))
-    for i, n in enumerate(sample_sizes, 1):
-        # Draw samples and compute means
-        sample_means = [np.mean(np.random.choice(population, size=n)) for _ in range(num_samples)]
-        
-        # Plot histogram with KDE
-        plt.subplot(2, 2, i)
-        sns.histplot(sample_means, bins=30, kde=True, stat="density")
-        plt.title(f"{dist_name}, Sample Size = {n}")
-        plt.xlabel("Sample Mean")
-        plt.ylabel("Density")
-    
-    plt.tight_layout()
-    plt.show()
-
-# 1. Uniform Distribution (e.g., values between 0 and 10)
-uniform_pop = np.random.uniform(low=0, high=10, size=population_size)
-simulate_clt("Uniform Distribution", uniform_pop, sample_sizes, num_samples)
-
-# 2. Exponential Distribution (e.g., scale = 2)
-exponential_pop = np.random.exponential(scale=2, size=population_size)
-simulate_clt("Exponential Distribution", exponential_pop, sample_sizes, num_samples)
-
-# 3. Binomial Distribution (e.g., n=10 trials, p=0.5)
-binomial_pop = np.random.binomial(n=10, p=0.5, size=population_size)
-simulate_clt("Binomial Distribution", binomial_pop, sample_sizes, num_samples)
-```
 
 ---
 
@@ -128,5 +75,3 @@ This hands-on approach makes the CLT less abstract. It’s not just a theorem—
 - **Markdown**: This response can be saved as a `.md` file.
 - **Python Script**: The code above is ready to run in a notebook. Add comments or tweak parameters (e.g., population size) as needed.
 - **Plots**: Generated automatically by the script.
-
-[Simulation](Problem_1.html)
