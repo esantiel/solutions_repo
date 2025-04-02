@@ -11,10 +11,9 @@
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/bcvnfQlz1x4?si=bl428S7Xqp5I51gK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-
-## Task Breakdown
-
-<span style="font-family: Arial; font-size: 20px;">[Simulation](Problem_1.html)</span>
+---
+[Simulation](Problem_1.html)
+---
 
 ### 1. Derivation of the Relationship
 
